@@ -1,0 +1,759 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>درباره ما | مرکز سلامت ساختمانی</title>
+    <link rel="stylesheet" href="styles.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="icon" type="image/png" href="Favicon.png" />
+    <link rel="shortcut icon" type="image/png" href="Favicon.png" />
+    <link rel="apple-touch-icon" href="Favicon.png" />
+
+    <!-- EmailJS and Supabase Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.3/dist/umd/supabase.js"></script>
+    <script src="config.js"></script>
+  </head>
+  <body>
+    <!-- Header -->
+    <header class="header">
+      <div class="container">
+        <div class="header-content">
+          <div class="search-icon" onclick="toggleSearch()">
+            <svg viewBox="0 0 24 24">
+              <path
+                d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"
+              />
+            </svg>
+          </div>
+          <div class="logo">
+            <a href="index.html">
+              <img
+                src="logo.png"
+                alt="Building Health Institute - BHI | مرکز سلامت ساختمانی"
+              />
+            </a>
+          </div>
+          <nav class="main-nav">
+            <ul>
+              <li><a href="index.html">خانه</a></li>
+              <li><a href="about.html" class="active">درباره ما</a></li>
+              <li><a href="services.html">خدمات</a></li>
+              <li><a href="certification.html">گواهینامه ها</a></li>
+              <li><a href="resources.html">منابع</a></li>
+              <li><a href="blog.html">وبلاگ</a></li>
+              <li><a href="contact.html">تماس</a></li>
+            </ul>
+          </nav>
+          <div class="header-actions">
+            <button class="btn btn-outline" onclick="openAuthModal('signIn')">
+              ورود
+            </button>
+            <button class="btn btn-primary" onclick="openAuthModal('signUp')">
+              ایجاد حساب
+            </button>
+          </div>
+
+          <!-- Hamburger Menu for Mobile -->
+          <div class="hamburger-menu" onclick="toggleMobileMenu()">
+            <span></span>
+            <span></span>
+            <span></span>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Mobile Navigation Overlay -->
+    <div
+      class="mobile-nav-overlay"
+      id="mobileNavOverlay"
+      onclick="closeMobileMenu()"
+    >
+      <div class="mobile-nav-menu" onclick="event.stopPropagation()">
+        <div class="mobile-nav-header">
+          <div class="logo">
+            <img src="logo.png" alt="مرکز سلامت ساختمانی" />
+          </div>
+          <button class="close-mobile-nav" onclick="closeMobileMenu()">
+            <svg viewBox="0 0 24 24">
+              <path
+                d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"
+              />
+            </svg>
+          </button>
+        </div>
+        <nav class="mobile-nav">
+          <ul>
+            <li><a href="index.html" onclick="closeMobileMenu()">خانه</a></li>
+            <li>
+              <a href="about.html" onclick="closeMobileMenu()">درباره ما</a>
+            </li>
+            <li>
+              <a href="services.html" onclick="closeMobileMenu()">خدمات</a>
+            </li>
+            <li>
+              <a href="certification.html" onclick="closeMobileMenu()"
+                >گواهینامه ها</a
+              >
+            </li>
+            <li>
+              <a href="resources.html" onclick="closeMobileMenu()">منابع</a>
+            </li>
+            <li><a href="blog.html" onclick="closeMobileMenu()">وبلاگ</a></li>
+            <li><a href="contact.html" onclick="closeMobileMenu()">تماس</a></li>
+          </ul>
+        </nav>
+        <div class="mobile-nav-actions">
+          <button
+            class="btn btn-outline mobile-btn"
+            onclick="openAuthModal('signIn'); closeMobileMenu();"
+          >
+            ورود
+          </button>
+          <button
+            class="btn btn-primary mobile-btn"
+            onclick="openAuthModal('signUp'); closeMobileMenu();"
+          >
+            ایجاد حساب
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Search Overlay -->
+    <div class="search-overlay" id="searchOverlay" onclick="closeSearch()">
+      <div class="search-container" onclick="event.stopPropagation()">
+        <div class="search-header">
+          <h3>جستجو در وب‌سایت</h3>
+          <button class="close-search" onclick="closeSearch()">×</button>
+        </div>
+        <div class="search-input-container">
+          <input
+            type="text"
+            id="searchInput"
+            placeholder="جستجو کنید..."
+            autocomplete="off"
+          />
+          <button class="search-btn" onclick="performSearch()">
+            <svg viewBox="0 0 24 24">
+              <path
+                d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"
+              />
+            </svg>
+          </button>
+        </div>
+        <div class="search-suggestions" id="searchSuggestions">
+          <div class="suggestion-category">
+            <h4>جستجوهای محبوب</h4>
+            <ul>
+              <li onclick="searchFor('زلزله')">زلزله</li>
+              <li onclick="searchFor('گواهینامه')">گواهینامه</li>
+              <li onclick="searchFor('بیمه')">بیمه</li>
+              <li onclick="searchFor('ارزیابی')">ارزیابی</li>
+            </ul>
+          </div>
+          <div class="suggestion-category">
+            <h4>دسته‌بندی‌ها</h4>
+            <ul>
+              <li onclick="searchFor('طبقه بندی زلزله')">طبقه بندی زلزله</li>
+              <li onclick="searchFor('کدهای ساختمانی')">کدهای ساختمانی</li>
+              <li onclick="searchFor('ارزیابی خطر')">ارزیابی خطر</li>
+              <li onclick="searchFor('آتش سوزی')">آتش سوزی</li>
+            </ul>
+          </div>
+        </div>
+        <div class="search-results" id="searchResults"></div>
+      </div>
+    </div>
+
+    <!-- Authentication Modals -->
+    <!-- Sign In Modal -->
+    <div
+      class="auth-overlay"
+      id="signInOverlay"
+      onclick="closeAuthModal('signIn')"
+    >
+      <div class="auth-modal" onclick="event.stopPropagation()">
+        <div class="auth-header">
+          <h2>ورود به حساب کاربری</h2>
+          <button class="close-auth" onclick="closeAuthModal('signIn')">
+            ×
+          </button>
+        </div>
+        <form class="auth-form" id="signInForm" onsubmit="handleSignIn(event)">
+          <div class="form-group">
+            <label for="signInEmail">ایمیل</label>
+            <input type="email" id="signInEmail" name="email" required />
+          </div>
+          <div class="form-group">
+            <label for="signInPassword">رمز عبور</label>
+            <div class="password-input-container">
+              <input
+                type="password"
+                id="signInPassword"
+                name="password"
+                required
+              />
+              <button
+                type="button"
+                class="password-toggle"
+                onclick="togglePasswordVisibility('signInPassword', this)"
+              >
+                <svg
+                  class="eye-icon"
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                >
+                  <path
+                    d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"
+                    fill="currentColor"
+                  />
+                </svg>
+              </button>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="checkbox-label">
+              <input type="checkbox" name="remember" />
+              <span>مرا به خاطر بسپار</span>
+            </label>
+          </div>
+          <button type="submit" class="btn btn-primary btn-full">
+            <span id="signInText">ورود</span>
+            <span id="signInLoading" style="display: none">در حال ورود...</span>
+          </button>
+          <div class="auth-footer">
+            <p>
+              حساب کاربری ندارید؟
+              <a href="#" onclick="switchAuthModal('signUp')">ثبت نام کنید</a>
+            </p>
+            <p>
+              <a href="#" onclick="handleForgotPassword()">فراموشی رمز عبور</a>
+            </p>
+            <p>
+              <a href="#" onclick="handleResendConfirmationFromForm()"
+                >ارسال مجدد ایمیل تأیید</a
+              >
+            </p>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Sign Up Modal -->
+    <div
+      class="auth-overlay"
+      id="signUpOverlay"
+      onclick="closeAuthModal('signUp')"
+    >
+      <div class="auth-modal" onclick="event.stopPropagation()">
+        <div class="auth-header">
+          <h2>ایجاد حساب کاربری</h2>
+          <button class="close-auth" onclick="closeAuthModal('signUp')">
+            ×
+          </button>
+        </div>
+        <form class="auth-form" id="signUpForm" onsubmit="handleSignUp(event)">
+          <div class="form-group">
+            <label for="signUpName">نام و نام خانوادگی</label>
+            <input type="text" id="signUpName" name="fullName" required />
+          </div>
+          <div class="form-group">
+            <label for="signUpEmail">ایمیل</label>
+            <input type="email" id="signUpEmail" name="email" required />
+          </div>
+          <div class="form-group">
+            <label for="signUpPassword">رمز عبور</label>
+            <div class="password-input-container">
+              <input
+                type="password"
+                id="signUpPassword"
+                name="password"
+                required
+                minlength="6"
+              />
+              <button
+                type="button"
+                class="password-toggle"
+                onclick="togglePasswordVisibility('signUpPassword', this)"
+              >
+                <svg
+                  class="eye-icon"
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                >
+                  <path
+                    d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"
+                    fill="currentColor"
+                  />
+                </svg>
+              </button>
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="signUpConfirmPassword">تکرار رمز عبور</label>
+            <div class="password-input-container">
+              <input
+                type="password"
+                id="signUpConfirmPassword"
+                name="confirmPassword"
+                required
+              />
+              <button
+                type="button"
+                class="password-toggle"
+                onclick="togglePasswordVisibility('signUpConfirmPassword', this)"
+              >
+                <svg
+                  class="eye-icon"
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                >
+                  <path
+                    d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"
+                    fill="currentColor"
+                  />
+                </svg>
+              </button>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="checkbox-label">
+              <input type="checkbox" name="terms" required />
+              <span>قوانین و مقررات را می‌پذیرم</span>
+            </label>
+          </div>
+          <button type="submit" class="btn btn-primary btn-full">
+            <span id="signUpText">ثبت نام</span>
+            <span id="signUpLoading" style="display: none"
+              >در حال ثبت نام...</span
+            >
+          </button>
+          <div class="auth-footer">
+            <p>
+              قبلاً ثبت نام کرده‌اید؟
+              <a href="#" onclick="switchAuthModal('signIn')">وارد شوید</a>
+            </p>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Page Header -->
+    <section class="page-header about-hero">
+      <div class="container">
+        <h1>درباره ما</h1>
+        <p>ارائه‌دهنده اطلاعات و خدمات تخصصی در زمینه ارزیابی خطرات املاک</p>
+      </div>
+    </section>
+
+    <!-- Main Content -->
+    <main class="page-content">
+      <div class="container">
+        <!-- About Section -->
+        <section class="about-section">
+          <div class="section-intro">
+            <h2>مرکز سلامت ساختمانی</h2>
+            <p class="lead">
+              ما یک استارتاپ نوآور در زمینه ارزیابی خطرات املاک و گواهینامه رتبه
+              بندی ساختمان‌ها هستیم. با تکیه بر تیمی متخصص با بیش از 15 سال
+              تجربه، ماموریت ما ارائه داده‌های دقیق، جامع و قابل اعتماد به صنعت
+              بیمه، نمایندگان بیمه و مالکان املاک است.
+            </p>
+          </div>
+
+          <div class="two-column-layout">
+            <div class="column">
+              <h3>چشم‌انداز ما</h3>
+              <p>
+                هدف ما تبدیل شدن به مرجع معتبر در ارائه گواهینامه‌های لرزه‌ای و
+                ارزیابی خطرات املاک در سطح ملی است. با استفاده از فناوری‌های
+                نوین و تیم متخصص خود، می‌خواهیم استانداردهای جدیدی در صنعت ایجاد
+                کنیم.
+              </p>
+            </div>
+            <div class="column">
+              <h3>ماموریت ما</h3>
+              <p>
+                ارائه اطلاعات دقیق، به‌موقع و جامع در مورد خطرات املاک به
+                شرکت‌های بیمه، نمایندگان و صاحبان املاک، تا بتوانند تصمیمات
+                آگاهانه‌تری در زمینه مدیریت ریسک و بیمه اتخاذ کنند.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        <!-- Our Story Section -->
+        <section class="story-section">
+          <h2>سفر ما</h2>
+          <div class="timeline">
+            <div class="timeline-item">
+              <div class="timeline-year">2024</div>
+              <div class="timeline-content">
+                <h3>آغاز یک رویا</h3>
+                <p>
+                  مرکز سلامت ساختمانی در سال 2024 با هدف انقلابی در صنعت ارزیابی
+                  خطرات املاک و ارائه گواهینامه‌های لرزه‌ای تاسیس شد. ما با تیمی
+                  متخصص و پرانگیزه آماده‌ایم تا استانداردهای جدیدی در این حوزه
+                  ایجاد کنیم.
+                </p>
+              </div>
+            </div>
+            <div class="timeline-item">
+              <div class="timeline-year">امروز</div>
+              <div class="timeline-content">
+                <h3>گام‌های اولیه</h3>
+                <p>
+                  ما در حال توسعه زیرساخت‌ها و ابزارهای پیشرفته برای ارائه خدمات
+                  با کیفیت هستیم. همکاری با بیش از 25 شرکت بیمه معتبر و داشتن
+                  تیمی با سال‌ها تجربه، ما را متمایز می‌کند.
+                </p>
+              </div>
+            </div>
+            <div class="timeline-item">
+              <div class="timeline-year">آینده</div>
+              <div class="timeline-content">
+                <h3>چشم‌انداز رشد</h3>
+                <p>
+                  هدف ما تبدیل شدن به مرجع معتبر گواهینامه رتبه بندی ساختمان‌ها
+                  در کشور است. با ارائه خدمات نوآورانه و با کیفیت، می‌خواهیم به
+                  ایمنی ساختمان‌ها و آرامش خاطر مالکان کمک کنیم.
+                </p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Values Section -->
+        <section class="values-section">
+          <h2>ارزش‌های ما</h2>
+          <div class="values-grid">
+            <div class="value-card">
+              <div class="value-icon">🎯</div>
+              <h3>دقت و صحت</h3>
+              <p>
+                ما به دقت و صحت داده‌های خود متعهدیم و از روش‌های علمی و
+                استاندارد برای جمع‌آوری و تحلیل اطلاعات استفاده می‌کنیم.
+              </p>
+            </div>
+            <div class="value-card">
+              <div class="value-icon">🤝</div>
+              <h3>اعتماد و شفافیت</h3>
+              <p>
+                اعتماد مشتریان ما مهم‌ترین سرمایه ماست. ما با شفافیت کامل در
+                تمام فرآیندها و روش‌های خود عمل می‌کنیم.
+              </p>
+            </div>
+            <div class="value-card">
+              <div class="value-icon">💡</div>
+              <h3>نوآوری مستمر</h3>
+              <p>
+                ما همواره در حال بهبود و توسعه ابزارها و روش‌های خود هستیم تا
+                بهترین خدمات را ارائه دهیم.
+              </p>
+            </div>
+            <div class="value-card">
+              <div class="value-icon">🌟</div>
+              <h3>تعالی خدمات</h3>
+              <p>
+                کیفیت بالای خدمات و رضایت مشتری اولویت اصلی ماست و تلاش می‌کنیم
+                همیشه فراتر از انتظارات عمل کنیم.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        <!-- Founder's Speech Video Section -->
+        <section class="founder-video-section">
+          <div class="container">
+            <div class="video-header">
+              <h2>پیام مؤسس</h2>
+              <p class="section-subtitle">
+                سخنرانی مؤسس مرکز سلامت ساختمان درباره اهداف، مأموریت و
+                چشم‌انداز شرکت
+              </p>
+            </div>
+            <div class="video-container">
+              <iframe
+                width="100%"
+                height="400"
+                src="https://www.aparat.com/video/video/embed/videohash/xmmg2kh/vt/frame"
+                title="پیام مؤسس مرکز سلامت ساختمان"
+                frameborder="0"
+                allowfullscreen
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                loading="lazy"
+                referrerpolicy="no-referrer-when-downgrade"
+              >
+                <p>
+                  مرورگر شما از نمایش ویدیو پشتیبانی نمی‌کند.
+                  <a href="https://www.aparat.com/v/xmmg2kh" target="_blank"
+                    >برای مشاهده ویدیو اینجا کلیک کنید</a
+                  >
+                </p>
+              </iframe>
+            </div>
+            <div class="video-description">
+              <p>
+                در این ویدیو، مهدی حصاری، مؤسس و مدیرعامل مرکز سلامت ساختمان،
+                درباره اهداف و مأموریت شرکت، خدمات ارائه شده و چشم‌انداز آینده
+                این مرکز صحبت می‌کند.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        <!-- Team Section -->
+        <section class="team-section">
+          <h2>تیم ما</h2>
+          <p class="section-subtitle">
+            تیم متخصص ما شامل مهندسان عمران، مهندسان برق قدرت، مهندسان مکانیک،
+            متخصصان بیمه، تحلیلگران داده و کارشناسان ارزیابی خطر است.
+          </p>
+          <div class="team-grid">
+            <div class="team-member">
+              <img src="staff's/mahdi hesari.jpg" alt="مهدی حصاری" />
+              <h3>مهدی حصاری</h3>
+              <p class="role">مؤسس و مدیرعامل</p>
+              <p class="bio">
+                کارشناسی ارشد مهندسی سازه با تخصص در توسعه ابزارهای تحلیل داده
+              </p>
+            </div>
+            <div class="team-member">
+              <img src="staff's/reza soleymani.jpg" alt="رضا سلیمانی" />
+              <h3>رضا سلیمانی</h3>
+              <p class="role">مشاور تخصصی مهندسی سازه</p>
+              <p class="bio">
+                دکترای تخصصی مهندسی سازه و زلزله با تخصص ارزیابی لرزه‌ای سازه‌ها
+                با بیش از 5 سال تجربه
+              </p>
+            </div>
+            <div class="team-member">
+              <img src="staff's/alireza moradpour.jpg" alt="علیرضا مرادپور" />
+              <h3>علیرضا مرادپور</h3>
+              <p class="role">مشاور تخصصی مهندسی مکانیک</p>
+              <p class="bio">
+                کارشناسی ارشد مهندسی مکانیک با تخصص در بهینه سازی سیستم های
+                مکانیکی با بیش از 7 سال تجربه
+              </p>
+            </div>
+            <div class="team-member">
+              <img src="staff's/morteza hesari.jpg" alt="مرتضی حصاری" />
+              <h3>مرتضی حصاری</h3>
+              <p class="role">امور قراردادها و روابط عمومی</p>
+              <p class="bio">
+                متخصص امور قراردادها با بیش از 29 سال سابقه مرتبط
+              </p>
+            </div>
+            <div class="team-member">
+              <img src="staff's/Payam Javadi.jpg" alt="پیام جوادی" />
+              <h3>پیام جوادی</h3>
+              <p class="role">مشاور تخصصی مهندسی برق قدرت</p>
+              <p class="bio">
+                مهندس برق قدرت با بیش از 25 سال تجربه در طراحی و ارزیابی
+                سیستم‌های الکتریکی ساختمان
+              </p>
+            </div>
+            <div class="team-member">
+              <img src="staff's/ghasem mehrabi.jpg" alt="مهرابی" />
+              <h3>قاسم مهرابی</h3>
+              <p class="role">مشاور تخصصی بیمه</p>
+              <p class="bio">
+                متخصص بیمه با سال‌ها تجربه در ارائه مشاوره تخصصی بیمه املاک و
+                ارزیابی خطرات
+              </p>
+            </div>
+          </div>
+        </section>
+
+        <!-- Stats Section -->
+        <section class="stats-section">
+          <h2>چرا ما؟</h2>
+          <p
+            class="section-subtitle"
+            style="text-align: center; max-width: 800px; margin: 0 auto 3rem"
+          >
+            ما یک استارتاپ نوآور در حوزه ارزیابی ساختمان و گواهینامه رتبه بندی
+            ساختمان‌ها هستیم. با تیمی متخصص و تجهیزات پیشرفته، آماده‌ایم تا
+            خدمات با کیفیت و استاندارد ارائه دهیم.
+          </p>
+          <div class="stats-grid">
+            <div class="stat-card">
+              <div class="stat-number">2024</div>
+              <div class="stat-label">سال تأسیس</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-number">15+</div>
+              <div class="stat-label">سال تجربه تیم</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-number">100%</div>
+              <div class="stat-label">تعهد به کیفیت</div>
+            </div>
+          </div>
+        </section>
+
+        <!-- CTA Section -->
+        <section class="cta-section">
+          <div class="cta-box">
+            <h2>آماده همکاری با ما هستید؟</h2>
+            <p>
+              با ما تماس بگیرید تا در مورد نیازهای شما مشاوره دهیم و بهترین
+              راه‌حل را ارائه کنیم.
+            </p>
+            <div class="cta-buttons">
+              <button
+                class="btn btn-primary"
+                onclick="window.location.href='contact.html'"
+              >
+                تماس با ما
+              </button>
+              <button
+                class="btn btn-outline"
+                onclick="window.location.href='services.html'"
+              >
+                مشاهده خدمات
+              </button>
+            </div>
+          </div>
+        </section>
+      </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+      <div class="container">
+        <div class="footer-content">
+          <div class="footer-section">
+            <h3>مرکز سلامت ساختمانی</h3>
+            <p>
+              ارائه‌دهنده اطلاعات و خدمات تخصصی در زمینه ارزیابی خطرات املاک و
+              بیمه
+            </p>
+            <div class="social-links">
+              <a
+                href="#"
+                onclick="handleSocialClick('linkedin')"
+                title="LinkedIn"
+              >
+                <svg
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="currentColor"
+                >
+                  <path
+                    d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"
+                  />
+                </svg>
+              </a>
+              <a
+                href="#"
+                onclick="handleSocialClick('telegram')"
+                title="Telegram"
+              >
+                <svg
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="currentColor"
+                >
+                  <path
+                    d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"
+                  />
+                </svg>
+              </a>
+              <a
+                href="#"
+                onclick="handleSocialClick('instagram')"
+                title="Instagram"
+              >
+                <svg
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="currentColor"
+                >
+                  <path
+                    d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"
+                  />
+                </svg>
+              </a>
+            </div>
+          </div>
+
+          <div class="footer-section">
+            <h4>شرکت</h4>
+            <ul>
+              <li><a href="about.html">درباره ما</a></li>
+              <li>
+                <a href="#" onclick="handleFooterClick('careers')"
+                  >فرصت‌های شغلی</a
+                >
+              </li>
+              <li>
+                <a href="#" onclick="handleFooterClick('media')">رسانه</a>
+              </li>
+              <li>
+                <a href="#" onclick="handleFooterClick('privacy')"
+                  >حریم خصوصی</a
+                >
+              </li>
+              <li>
+                <a href="#" onclick="handleFooterClick('terms')"
+                  >شرایط استفاده</a
+                >
+              </li>
+            </ul>
+          </div>
+
+          <div class="footer-section">
+            <h4>منابع</h4>
+            <ul>
+              <li>
+                <a href="#" onclick="handleFooterClick('faq')">سوالات متداول</a>
+              </li>
+              <li>
+                <a href="#" onclick="handleFooterClick('help')">مرکز راهنما</a>
+              </li>
+              <li>
+                <a href="#" onclick="handleFooterClick('newsletter')"
+                  >خبرنامه</a
+                >
+              </li>
+              <li><a href="blog.html">وبلاگ</a></li>
+            </ul>
+          </div>
+
+          <div class="footer-section">
+            <h4>تماس با ما</h4>
+            <ul class="contact-info">
+              <li>تلفن: ۰۹۰۳۶۰۰۶۰۳۵</li>
+              <li>ایمیل: hesarimahdi261@gamil.com</li>
+              <li>ساعات کاری: 7:00 الی 18:00</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="footer-bottom">
+          <p>© ۱۴۰۴ مرکز سلامت ساختمانی. تمامی حقوق محفوظ است.</p>
+        </div>
+      </div>
+    </footer>
+
+    <script src="script.js"></script>
+  </body>
+</html>

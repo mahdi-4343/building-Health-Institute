@@ -1,0 +1,43 @@
+{
+  "name": "earthquake-building-classification",
+  "version": "1.0.0",
+  "description": "یک وبسایت مدرن و حرفه‌ای به زبان فارسی برای ارائه اطلاعات در مورد طبقه‌بندی ساختمان‌ها در برابر زلزله",
+  "main": "server-example.js",
+  "scripts": {
+    "start": "node server-example.js",
+    "dev": "nodemon server-example.js",
+    "serve": "live-server --port=8080 --entry-file=index.html"
+  },
+  "keywords": [
+    "earthquake",
+    "building",
+    "classification",
+    "persian",
+    "farsi",
+    "construction",
+    "safety"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.18.2",
+    "cors": "^2.8.5",
+    "body-parser": "^1.20.2"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1",
+    "live-server": "^1.2.2"
+  },
+  "engines": {
+    "node": ">=14.0.0",
+    "npm": ">=6.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yourusername/earthquake-building-classification.git"
+  },
+  "bugs": {
+    "url": "https://github.com/yourusername/earthquake-building-classification/issues"
+  },
+  "homepage": "https://github.com/yourusername/earthquake-building-classification#readme"
+}

@@ -1,0 +1,770 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>خدمات ما | مرکز سلامت ساختمانی</title>
+    <link rel="stylesheet" href="styles.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="icon" type="image/png" href="Favicon.png" />
+    <link rel="shortcut icon" type="image/png" href="Favicon.png" />
+    <link rel="apple-touch-icon" href="Favicon.png" />
+
+    <!-- EmailJS and Supabase Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.3/dist/umd/supabase.js"></script>
+    <script src="config.js"></script>
+  </head>
+  <body>
+    <!-- Header -->
+    <header class="header">
+      <div class="container">
+        <div class="header-content">
+          <div class="search-icon" onclick="toggleSearch()">
+            <svg viewBox="0 0 24 24">
+              <path
+                d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"
+              />
+            </svg>
+          </div>
+          <div class="logo">
+            <a href="index.html">
+              <img
+                src="logo.png"
+                alt="Building Health Institute - BHI | مرکز سلامت ساختمانی"
+              />
+            </a>
+          </div>
+          <nav class="main-nav">
+            <ul>
+              <li><a href="index.html">خانه</a></li>
+              <li><a href="about.html">درباره ما</a></li>
+              <li><a href="services.html" class="active">خدمات</a></li>
+              <li><a href="certification.html">گواهینامه ها</a></li>
+              <li><a href="resources.html">منابع</a></li>
+              <li><a href="blog.html">وبلاگ</a></li>
+              <li><a href="contact.html">تماس</a></li>
+            </ul>
+          </nav>
+          <div class="header-actions">
+            <button class="btn btn-outline" onclick="openAuthModal('signIn')">
+              ورود
+            </button>
+            <button class="btn btn-primary" onclick="openAuthModal('signUp')">
+              ایجاد حساب
+            </button>
+          </div>
+
+          <!-- Hamburger Menu for Mobile -->
+          <div class="hamburger-menu" onclick="toggleMobileMenu()">
+            <span></span>
+            <span></span>
+            <span></span>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Mobile Navigation Overlay -->
+    <div
+      class="mobile-nav-overlay"
+      id="mobileNavOverlay"
+      onclick="closeMobileMenu()"
+    >
+      <div class="mobile-nav-menu" onclick="event.stopPropagation()">
+        <div class="mobile-nav-header">
+          <div class="logo">
+            <img src="logo.png" alt="مرکز سلامت ساختمانی" />
+          </div>
+          <button class="close-mobile-nav" onclick="closeMobileMenu()">
+            <svg viewBox="0 0 24 24">
+              <path
+                d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"
+              />
+            </svg>
+          </button>
+        </div>
+        <nav class="mobile-nav">
+          <ul>
+            <li><a href="index.html" onclick="closeMobileMenu()">خانه</a></li>
+            <li>
+              <a href="about.html" onclick="closeMobileMenu()">درباره ما</a>
+            </li>
+            <li>
+              <a href="services.html" onclick="closeMobileMenu()">خدمات</a>
+            </li>
+            <li>
+              <a href="certification.html" onclick="closeMobileMenu()"
+                >گواهینامه ها</a
+              >
+            </li>
+            <li>
+              <a href="resources.html" onclick="closeMobileMenu()">منابع</a>
+            </li>
+            <li><a href="blog.html" onclick="closeMobileMenu()">وبلاگ</a></li>
+            <li><a href="contact.html" onclick="closeMobileMenu()">تماس</a></li>
+          </ul>
+        </nav>
+        <div class="mobile-nav-actions">
+          <button
+            class="btn btn-outline mobile-btn"
+            onclick="openAuthModal('signIn'); closeMobileMenu();"
+          >
+            ورود
+          </button>
+          <button
+            class="btn btn-primary mobile-btn"
+            onclick="openAuthModal('signUp'); closeMobileMenu();"
+          >
+            ایجاد حساب
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Search Overlay -->
+    <div class="search-overlay" id="searchOverlay" onclick="closeSearch()">
+      <div class="search-container" onclick="event.stopPropagation()">
+        <div class="search-header">
+          <h3>جستجو در وب‌سایت</h3>
+          <button class="close-search" onclick="closeSearch()">×</button>
+        </div>
+        <div class="search-input-container">
+          <input
+            type="text"
+            id="searchInput"
+            placeholder="جستجو کنید..."
+            autocomplete="off"
+          />
+          <button class="search-btn" onclick="performSearch()">
+            <svg viewBox="0 0 24 24">
+              <path
+                d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"
+              />
+            </svg>
+          </button>
+        </div>
+        <div class="search-suggestions" id="searchSuggestions">
+          <div class="suggestion-category">
+            <h4>جستجوهای محبوب</h4>
+            <ul>
+              <li onclick="searchFor('زلزله')">زلزله</li>
+              <li onclick="searchFor('گواهینامه')">گواهینامه</li>
+              <li onclick="searchFor('بیمه')">بیمه</li>
+              <li onclick="searchFor('ارزیابی')">ارزیابی</li>
+            </ul>
+          </div>
+          <div class="suggestion-category">
+            <h4>دسته‌بندی‌ها</h4>
+            <ul>
+              <li onclick="searchFor('طبقه بندی زلزله')">طبقه بندی زلزله</li>
+              <li onclick="searchFor('کدهای ساختمانی')">کدهای ساختمانی</li>
+              <li onclick="searchFor('ارزیابی خطر')">ارزیابی خطر</li>
+              <li onclick="searchFor('آتش سوزی')">آتش سوزی</li>
+            </ul>
+          </div>
+        </div>
+        <div class="search-results" id="searchResults"></div>
+      </div>
+    </div>
+
+    <!-- Authentication Modals -->
+    <!-- Sign In Modal -->
+    <div
+      class="auth-overlay"
+      id="signInOverlay"
+      onclick="closeAuthModal('signIn')"
+    >
+      <div class="auth-modal" onclick="event.stopPropagation()">
+        <div class="auth-header">
+          <h2>ورود به حساب کاربری</h2>
+          <button class="close-auth" onclick="closeAuthModal('signIn')">
+            ×
+          </button>
+        </div>
+        <form class="auth-form" id="signInForm" onsubmit="handleSignIn(event)">
+          <div class="form-group">
+            <label for="signInEmail">ایمیل</label>
+            <input type="email" id="signInEmail" name="email" required />
+          </div>
+          <div class="form-group">
+            <label for="signInPassword">رمز عبور</label>
+            <div class="password-input-container">
+              <input
+                type="password"
+                id="signInPassword"
+                name="password"
+                required
+              />
+              <button
+                type="button"
+                class="password-toggle"
+                onclick="togglePasswordVisibility('signInPassword', this)"
+              >
+                <svg
+                  class="eye-icon"
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                >
+                  <path
+                    d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"
+                    fill="currentColor"
+                  />
+                </svg>
+              </button>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="checkbox-label">
+              <input type="checkbox" name="remember" />
+              <span>مرا به خاطر بسپار</span>
+            </label>
+          </div>
+          <button type="submit" class="btn btn-primary btn-full">
+            <span id="signInText">ورود</span>
+            <span id="signInLoading" style="display: none">در حال ورود...</span>
+          </button>
+          <div class="auth-footer">
+            <p>
+              حساب کاربری ندارید؟
+              <a href="#" onclick="switchAuthModal('signUp')">ثبت نام کنید</a>
+            </p>
+            <p>
+              <a href="#" onclick="handleForgotPassword()">فراموشی رمز عبور</a>
+            </p>
+            <p>
+              <a href="#" onclick="handleResendConfirmationFromForm()"
+                >ارسال مجدد ایمیل تأیید</a
+              >
+            </p>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Sign Up Modal -->
+    <div
+      class="auth-overlay"
+      id="signUpOverlay"
+      onclick="closeAuthModal('signUp')"
+    >
+      <div class="auth-modal" onclick="event.stopPropagation()">
+        <div class="auth-header">
+          <h2>ایجاد حساب کاربری</h2>
+          <button class="close-auth" onclick="closeAuthModal('signUp')">
+            ×
+          </button>
+        </div>
+        <form class="auth-form" id="signUpForm" onsubmit="handleSignUp(event)">
+          <div class="form-group">
+            <label for="signUpName">نام و نام خانوادگی</label>
+            <input type="text" id="signUpName" name="fullName" required />
+          </div>
+          <div class="form-group">
+            <label for="signUpEmail">ایمیل</label>
+            <input type="email" id="signUpEmail" name="email" required />
+          </div>
+          <div class="form-group">
+            <label for="signUpPassword">رمز عبور</label>
+            <div class="password-input-container">
+              <input
+                type="password"
+                id="signUpPassword"
+                name="password"
+                required
+                minlength="6"
+              />
+              <button
+                type="button"
+                class="password-toggle"
+                onclick="togglePasswordVisibility('signUpPassword', this)"
+              >
+                <svg
+                  class="eye-icon"
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                >
+                  <path
+                    d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"
+                    fill="currentColor"
+                  />
+                </svg>
+              </button>
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="signUpConfirmPassword">تکرار رمز عبور</label>
+            <div class="password-input-container">
+              <input
+                type="password"
+                id="signUpConfirmPassword"
+                name="confirmPassword"
+                required
+              />
+              <button
+                type="button"
+                class="password-toggle"
+                onclick="togglePasswordVisibility('signUpConfirmPassword', this)"
+              >
+                <svg
+                  class="eye-icon"
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                >
+                  <path
+                    d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"
+                    fill="currentColor"
+                  />
+                </svg>
+              </button>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="checkbox-label">
+              <input type="checkbox" name="terms" required />
+              <span>قوانین و مقررات را می‌پذیرم</span>
+            </label>
+          </div>
+          <button type="submit" class="btn btn-primary btn-full">
+            <span id="signUpText">ثبت نام</span>
+            <span id="signUpLoading" style="display: none"
+              >در حال ثبت نام...</span
+            >
+          </button>
+          <div class="auth-footer">
+            <p>
+              قبلاً ثبت نام کرده‌اید؟
+              <a href="#" onclick="switchAuthModal('signIn')">وارد شوید</a>
+            </p>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Page Header -->
+    <section class="page-header services-hero">
+      <div class="container">
+        <h1>خدمات ما</h1>
+        <p>راه‌حل‌های جامع برای ارزیابی و مدیریت خطر املاک</p>
+      </div>
+    </section>
+
+    <!-- Main Content -->
+    <main class="page-content">
+      <div class="container">
+        <!-- Services Overview -->
+        <section class="services-intro">
+          <div class="section-intro">
+            <h2>خدمات تخصصی ما</h2>
+            <p class="lead">
+              ما طیف وسیعی از خدمات را برای کمک به شما در ارزیابی و مدیریت خطرات
+              املاک ارائه می‌دهیم. از گزارش‌های جامع املاک گرفته تا ابزارهای
+              تحلیل پیشرفته، ما همه چیز را برای تصمیم‌گیری‌های آگاهانه فراهم
+              کرده‌ایم.
+            </p>
+          </div>
+        </section>
+
+        <!-- Main Services -->
+        <section class="main-services">
+          <h2>خدمات اصلی</h2>
+
+          <div class="service-item">
+            <div class="service-content">
+              <div class="service-icon">📊</div>
+              <div class="service-details">
+                <h3>گزارش‌های املاک تجاری</h3>
+                <p>
+                  گزارش‌های جامع و دقیق درباره املاک تجاری شامل طبقه‌بندی زلزله،
+                  طبقه‌بندی آتش‌سوزی، ارزیابی سیستم‌های اسپرینکلر و سایر عوامل
+                  مؤثر بر خطر.
+                </p>
+                <ul class="service-features">
+                  <li>✓ بازرسی حرفه‌ای توسط کارشناسان مجرب</li>
+                  <li>✓ طبقه‌بندی دقیق زلزله و آتش‌سوزی</li>
+                  <li>✓ ارزیابی سیستم‌های ایمنی و اطفاء حریق</li>
+                  <li>✓ گزارش‌های قابل فهم و کاربردی</li>
+                  <li>✓ به‌روزرسانی منظم اطلاعات</li>
+                </ul>
+                <button class="btn btn-primary" onclick="handleToolAccess()">
+                  درخواست گزارش
+                </button>
+              </div>
+            </div>
+            <div class="service-image">
+              <img
+                src="https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?w=600&h=400&fit=crop"
+                alt="گزارش‌های املاک تجاری"
+              />
+            </div>
+          </div>
+
+          <div class="service-item reverse">
+            <div class="service-content">
+              <div class="service-icon">🌍</div>
+              <div class="service-details">
+                <h3>ابزار QuakeScout</h3>
+                <p>
+                  ابزار پیشرفته تحلیل خطر زلزله که داده‌های جامعی در مورد فاصله
+                  تا گسل، نوع خاک، نقشه‌های روانگرایی و سایر عوامل مؤثر بر خطر
+                  زلزله ارائه می‌دهد.
+                </p>
+                <ul class="service-features">
+                  <li>✓ نقشه‌های تعاملی خطر زلزله</li>
+                  <li>✓ اطلاعات دقیق گسل‌های فعال</li>
+                  <li>✓ تحلیل نوع خاک و روانگرایی</li>
+                  <li>✓ پیش‌بینی شدت لرزش زمین</li>
+                  <li>✓ گزارش‌های قابل دانلود و چاپ</li>
+                </ul>
+                <button class="btn btn-primary" onclick="handleToolAccess()">
+                  استفاده از QuakeScout
+                </button>
+              </div>
+            </div>
+            <div class="service-image">
+              <img
+                src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=600&h=400&fit=crop"
+                alt="ابزار QuakeScout"
+              />
+            </div>
+          </div>
+
+          <div class="service-item">
+            <div class="service-content">
+              <div class="service-icon">🔍</div>
+              <div class="service-details">
+                <h3>ارزیابی کلاس‌های حفاظت</h3>
+                <p>
+                  ارزیابی و تعیین کلاس حفاظت در برابر آتش‌سوزی برای املاک شما بر
+                  اساس استانداردهای ملی و بین‌المللی.
+                </p>
+                <ul class="service-features">
+                  <li>✓ بررسی دقیق تأسیسات آتش‌نشانی منطقه</li>
+                  <li>✓ ارزیابی منابع آب و فشار آب</li>
+                  <li>✓ تحلیل زمان پاسخ‌گویی اورژانس</li>
+                  <li>✓ پیشنهادات بهبود کلاس حفاظت</li>
+                  <li>✓ مشاوره تخصصی برای کاهش خطر</li>
+                </ul>
+                <button class="btn btn-primary" onclick="handleToolAccess()">
+                  درخواست ارزیابی
+                </button>
+              </div>
+            </div>
+            <div class="service-image">
+              <img
+                src="https://images.unsplash.com/photo-1589939705384-5185137a7f0f?w=600&h=400&fit=crop"
+                alt="ارزیابی کلاس‌های حفاظت"
+              />
+            </div>
+          </div>
+
+          <div class="service-item reverse">
+            <div class="service-content">
+              <div class="service-icon">💰</div>
+              <div class="service-details">
+                <h3>خدمات مشاوره بیمه</h3>
+                <p>
+                  مشاوره تخصصی در زمینه بیمه املاک، محاسبه حق بیمه، ارزیابی
+                  پوشش‌های بیمه‌ای و کمک به انتخاب بهترین بیمه‌نامه.
+                </p>
+                <ul class="service-features">
+                  <li>✓ تحلیل خطر و ارزیابی نیاز بیمه‌ای</li>
+                  <li>✓ محاسبه دقیق حق بیمه</li>
+                  <li>✓ مشاوره در انتخاب پوشش مناسب</li>
+                  <li>✓ بررسی و بهینه‌سازی بیمه‌نامه‌های موجود</li>
+                  <li>✓ پشتیبانی در فرآیند خسارت</li>
+                </ul>
+                <button class="btn btn-primary" onclick="handleToolAccess()">
+                  دریافت مشاوره
+                </button>
+              </div>
+            </div>
+            <div class="service-image">
+              <img
+                src="https://images.unsplash.com/photo-1554224155-6726b3ff858f?w=600&h=400&fit=crop"
+                alt="خدمات مشاوره بیمه"
+              />
+            </div>
+          </div>
+        </section>
+
+        <!-- Additional Services -->
+        <section class="additional-services">
+          <h2>خدمات تکمیلی</h2>
+          <div class="services-grid">
+            <div class="service-card">
+              <div class="service-card-icon">📋</div>
+              <h3>ارزیابی آسیب‌پذیری لرزه‌ای</h3>
+              <p>
+                تحلیل جامع آسیب‌پذیری سازه در برابر زلزله و ارائه راهکارهای
+                مقاوم‌سازی
+              </p>
+            </div>
+
+            <div class="service-card">
+              <div class="service-card-icon">🏗️</div>
+              <h3>بازرسی سیستم‌های اسپرینکلر</h3>
+              <p>
+                بازرسی و ارزیابی سیستم‌های اطفاء حریق خودکار مطابق استانداردهای
+                NFPA
+              </p>
+            </div>
+
+            <div class="service-card">
+              <div class="service-card-icon">📱</div>
+              <h3>API و یکپارچه‌سازی</h3>
+              <p>
+                امکان دسترسی به داده‌های ما از طریق API برای یکپارچه‌سازی با
+                سیستم‌های شما
+              </p>
+            </div>
+
+            <div class="service-card">
+              <div class="service-card-icon">🎓</div>
+              <h3>آموزش و ورکشاپ</h3>
+              <p>
+                برگزاری دوره‌های آموزشی و ورکشاپ‌های تخصصی در زمینه ارزیابی خطر
+                املاک
+              </p>
+            </div>
+
+            <div class="service-card">
+              <div class="service-card-icon">📈</div>
+              <h3>تحلیل پرتفوی</h3>
+              <p>
+                تحلیل و ارزیابی خطر برای مجموعه املاک (پرتفوی) شرکت‌های بزرگ
+              </p>
+            </div>
+
+            <div class="service-card">
+              <div class="service-card-icon">🛡️</div>
+              <h3>مشاوره کاهش خطر</h3>
+              <p>ارائه راهکارهای عملی برای کاهش خطرات و بهبود ایمنی املاک</p>
+            </div>
+          </div>
+        </section>
+
+        <!-- Pricing Section -->
+        <section class="pricing-section">
+          <h2>پکیج‌های خدماتی</h2>
+          <p class="section-subtitle">
+            بسته‌های متنوع برای نیازهای مختلف - از کسب‌وکارهای کوچک تا شرکت‌های
+            بزرگ
+          </p>
+          <div class="pricing-grid">
+            <div class="pricing-card">
+              <h3>پایه</h3>
+              <div class="price">تماس بگیرید</div>
+              <ul class="pricing-features">
+                <li>✓ گزارش ساده املاک</li>
+                <li>✓ طبقه‌بندی زلزله</li>
+                <li>✓ دسترسی محدود به QuakeScout</li>
+                <li>✓ پشتیبانی ایمیلی</li>
+              </ul>
+              <button
+                class="btn btn-outline"
+                onclick="window.location.href='contact.html'"
+              >
+                اطلاعات بیشتر
+              </button>
+            </div>
+
+            <div class="pricing-card featured">
+              <div class="badge">محبوب</div>
+              <h3>حرفه‌ای</h3>
+              <div class="price">تماس بگیرید</div>
+              <ul class="pricing-features">
+                <li>✓ گزارش کامل املاک تجاری</li>
+                <li>✓ دسترسی کامل به QuakeScout</li>
+                <li>✓ ارزیابی سیستم اسپرینکلر</li>
+                <li>✓ مشاوره تخصصی</li>
+                <li>✓ پشتیبانی تلفنی 24/7</li>
+              </ul>
+              <button
+                class="btn btn-primary"
+                onclick="window.location.href='contact.html'"
+              >
+                شروع کنید
+              </button>
+            </div>
+
+            <div class="pricing-card">
+              <h3>سازمانی</h3>
+              <div class="price">تماس بگیرید</div>
+              <ul class="pricing-features">
+                <li>✓ تمام خدمات حرفه‌ای</li>
+                <li>✓ تحلیل پرتفوی</li>
+                <li>✓ دسترسی API</li>
+                <li>✓ آموزش اختصاصی</li>
+                <li>✓ مدیر حساب اختصاصی</li>
+                <li>✓ قراردادهای سفارشی</li>
+              </ul>
+              <button
+                class="btn btn-outline"
+                onclick="window.location.href='contact.html'"
+              >
+                تماس با فروش
+              </button>
+            </div>
+          </div>
+        </section>
+
+        <!-- CTA Section -->
+        <section class="cta-section">
+          <div class="cta-box">
+            <h2>نیاز به مشاوره دارید؟</h2>
+            <p>
+              تیم متخصص ما آماده است تا در مورد نیازهای خاص شما مشاوره دهد و
+              بهترین راه‌حل را برای شما پیدا کند.
+            </p>
+            <div class="cta-buttons">
+              <button
+                class="btn btn-primary"
+                onclick="window.location.href='contact.html'"
+              >
+                تماس با ما
+              </button>
+              <button class="btn btn-outline" onclick="handleLogin()">
+                ورود به سیستم
+              </button>
+            </div>
+          </div>
+        </section>
+      </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+      <div class="container">
+        <div class="footer-content">
+          <div class="footer-section">
+            <h3>مرکز سلامت ساختمانی</h3>
+            <p>
+              ارائه‌دهنده اطلاعات و خدمات تخصصی در زمینه ارزیابی خطرات املاک و
+              بیمه
+            </p>
+            <div class="social-links">
+              <a
+                href="#"
+                onclick="handleSocialClick('linkedin')"
+                title="LinkedIn"
+              >
+                <svg
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="currentColor"
+                >
+                  <path
+                    d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"
+                  />
+                </svg>
+              </a>
+              <a
+                href="#"
+                onclick="handleSocialClick('telegram')"
+                title="Telegram"
+              >
+                <svg
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="currentColor"
+                >
+                  <path
+                    d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"
+                  />
+                </svg>
+              </a>
+              <a
+                href="#"
+                onclick="handleSocialClick('instagram')"
+                title="Instagram"
+              >
+                <svg
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="currentColor"
+                >
+                  <path
+                    d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"
+                  />
+                </svg>
+              </a>
+            </div>
+          </div>
+
+          <div class="footer-section">
+            <h4>شرکت</h4>
+            <ul>
+              <li><a href="about.html">درباره ما</a></li>
+              <li>
+                <a href="#" onclick="handleFooterClick('careers')"
+                  >فرصت‌های شغلی</a
+                >
+              </li>
+              <li>
+                <a href="#" onclick="handleFooterClick('media')">رسانه</a>
+              </li>
+              <li>
+                <a href="#" onclick="handleFooterClick('privacy')"
+                  >حریم خصوصی</a
+                >
+              </li>
+              <li>
+                <a href="#" onclick="handleFooterClick('terms')"
+                  >شرایط استفاده</a
+                >
+              </li>
+            </ul>
+          </div>
+
+          <div class="footer-section">
+            <h4>منابع</h4>
+            <ul>
+              <li>
+                <a href="#" onclick="handleFooterClick('faq')">سوالات متداول</a>
+              </li>
+              <li>
+                <a href="#" onclick="handleFooterClick('help')">مرکز راهنما</a>
+              </li>
+              <li>
+                <a href="#" onclick="handleFooterClick('newsletter')"
+                  >خبرنامه</a
+                >
+              </li>
+              <li><a href="blog.html">وبلاگ</a></li>
+            </ul>
+          </div>
+
+          <div class="footer-section">
+            <h4>تماس با ما</h4>
+            <ul class="contact-info">
+              <li>تلفن: ۰۹۰۳۶۰۰۶۰۳۵</li>
+              <li>ایمیل: hesarimahdi261@gamil.com</li>
+              <li>ساعات کاری: 7:00 الی 18:00</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="footer-bottom">
+          <p>© ۱۴۰۴ مرکز سلامت ساختمانی. تمامی حقوق محفوظ است.</p>
+        </div>
+      </div>
+    </footer>
+
+    <script src="script.js"></script>
+  </body>
+</html>

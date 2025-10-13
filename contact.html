@@ -1,0 +1,804 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>تماس با ما | مرکز سلامت ساختمانی</title>
+    <link rel="stylesheet" href="styles.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="icon" type="image/png" href="Favicon.png" />
+    <link rel="shortcut icon" type="image/png" href="Favicon.png" />
+    <link rel="apple-touch-icon" href="Favicon.png" />
+
+    <!-- EmailJS and Supabase Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.3/dist/umd/supabase.js"></script>
+    <script src="config.js"></script>
+  </head>
+  <body>
+    <!-- Header -->
+    <header class="header">
+      <div class="container">
+        <div class="header-content">
+          <div class="search-icon" onclick="toggleSearch()">
+            <svg viewBox="0 0 24 24">
+              <path
+                d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"
+              />
+            </svg>
+          </div>
+          <div class="logo">
+            <a href="index.html">
+              <img
+                src="logo.png"
+                alt="Building Health Institute - BHI | مرکز سلامت ساختمانی"
+              />
+            </a>
+          </div>
+          <nav class="main-nav">
+            <ul>
+              <li><a href="index.html">خانه</a></li>
+              <li><a href="about.html">درباره ما</a></li>
+              <li><a href="services.html">خدمات</a></li>
+              <li><a href="certification.html">گواهینامه ها</a></li>
+              <li><a href="resources.html">منابع</a></li>
+              <li><a href="blog.html">وبلاگ</a></li>
+              <li><a href="contact.html" class="active">تماس</a></li>
+            </ul>
+          </nav>
+          <div class="header-actions">
+            <button class="btn btn-outline" onclick="openAuthModal('signIn')">
+              ورود
+            </button>
+            <button class="btn btn-primary" onclick="openAuthModal('signUp')">
+              ایجاد حساب
+            </button>
+          </div>
+
+          <!-- Hamburger Menu for Mobile -->
+          <div class="hamburger-menu" onclick="toggleMobileMenu()">
+            <span></span>
+            <span></span>
+            <span></span>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Mobile Navigation Overlay -->
+    <div
+      class="mobile-nav-overlay"
+      id="mobileNavOverlay"
+      onclick="closeMobileMenu()"
+    >
+      <div class="mobile-nav-menu" onclick="event.stopPropagation()">
+        <div class="mobile-nav-header">
+          <div class="logo">
+            <img src="logo.png" alt="مرکز سلامت ساختمانی" />
+          </div>
+          <button class="close-mobile-nav" onclick="closeMobileMenu()">
+            <svg viewBox="0 0 24 24">
+              <path
+                d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"
+              />
+            </svg>
+          </button>
+        </div>
+        <nav class="mobile-nav">
+          <ul>
+            <li><a href="index.html" onclick="closeMobileMenu()">خانه</a></li>
+            <li>
+              <a href="about.html" onclick="closeMobileMenu()">درباره ما</a>
+            </li>
+            <li>
+              <a href="services.html" onclick="closeMobileMenu()">خدمات</a>
+            </li>
+            <li>
+              <a href="certification.html" onclick="closeMobileMenu()"
+                >گواهینامه ها</a
+              >
+            </li>
+            <li>
+              <a href="resources.html" onclick="closeMobileMenu()">منابع</a>
+            </li>
+            <li><a href="blog.html" onclick="closeMobileMenu()">وبلاگ</a></li>
+            <li><a href="contact.html" onclick="closeMobileMenu()">تماس</a></li>
+          </ul>
+        </nav>
+        <div class="mobile-nav-actions">
+          <button
+            class="btn btn-outline mobile-btn"
+            onclick="openAuthModal('signIn'); closeMobileMenu();"
+          >
+            ورود
+          </button>
+          <button
+            class="btn btn-primary mobile-btn"
+            onclick="openAuthModal('signUp'); closeMobileMenu();"
+          >
+            ایجاد حساب
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Search Overlay -->
+    <div class="search-overlay" id="searchOverlay" onclick="closeSearch()">
+      <div class="search-container" onclick="event.stopPropagation()">
+        <div class="search-header">
+          <h3>جستجو در وب‌سایت</h3>
+          <button class="close-search" onclick="closeSearch()">×</button>
+        </div>
+        <div class="search-input-container">
+          <input
+            type="text"
+            id="searchInput"
+            placeholder="جستجو کنید..."
+            autocomplete="off"
+          />
+          <button class="search-btn" onclick="performSearch()">
+            <svg viewBox="0 0 24 24">
+              <path
+                d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"
+              />
+            </svg>
+          </button>
+        </div>
+        <div class="search-suggestions" id="searchSuggestions">
+          <div class="suggestion-category">
+            <h4>جستجوهای محبوب</h4>
+            <ul>
+              <li onclick="searchFor('زلزله')">زلزله</li>
+              <li onclick="searchFor('گواهینامه')">گواهینامه</li>
+              <li onclick="searchFor('بیمه')">بیمه</li>
+              <li onclick="searchFor('ارزیابی')">ارزیابی</li>
+            </ul>
+          </div>
+          <div class="suggestion-category">
+            <h4>دسته‌بندی‌ها</h4>
+            <ul>
+              <li onclick="searchFor('طبقه بندی زلزله')">طبقه بندی زلزله</li>
+              <li onclick="searchFor('کدهای ساختمانی')">کدهای ساختمانی</li>
+              <li onclick="searchFor('ارزیابی خطر')">ارزیابی خطر</li>
+              <li onclick="searchFor('آتش سوزی')">آتش سوزی</li>
+            </ul>
+          </div>
+        </div>
+        <div class="search-results" id="searchResults"></div>
+      </div>
+    </div>
+
+    <!-- Authentication Modals -->
+    <!-- Sign In Modal -->
+    <div
+      class="auth-overlay"
+      id="signInOverlay"
+      onclick="closeAuthModal('signIn')"
+    >
+      <div class="auth-modal" onclick="event.stopPropagation()">
+        <div class="auth-header">
+          <h2>ورود به حساب کاربری</h2>
+          <button class="close-auth" onclick="closeAuthModal('signIn')">
+            ×
+          </button>
+        </div>
+        <form class="auth-form" id="signInForm" onsubmit="handleSignIn(event)">
+          <div class="form-group">
+            <label for="signInEmail">ایمیل</label>
+            <input type="email" id="signInEmail" name="email" required />
+          </div>
+          <div class="form-group">
+            <label for="signInPassword">رمز عبور</label>
+            <div class="password-input-container">
+              <input
+                type="password"
+                id="signInPassword"
+                name="password"
+                required
+              />
+              <button
+                type="button"
+                class="password-toggle"
+                onclick="togglePasswordVisibility('signInPassword', this)"
+              >
+                <svg
+                  class="eye-icon"
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                >
+                  <path
+                    d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"
+                    fill="currentColor"
+                  />
+                </svg>
+              </button>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="checkbox-label">
+              <input type="checkbox" name="remember" />
+              <span>مرا به خاطر بسپار</span>
+            </label>
+          </div>
+          <button type="submit" class="btn btn-primary btn-full">
+            <span id="signInText">ورود</span>
+            <span id="signInLoading" style="display: none">در حال ورود...</span>
+          </button>
+          <div class="auth-footer">
+            <p>
+              حساب کاربری ندارید؟
+              <a href="#" onclick="switchAuthModal('signUp')">ثبت نام کنید</a>
+            </p>
+            <p>
+              <a href="#" onclick="handleForgotPassword()">فراموشی رمز عبور</a>
+            </p>
+            <p>
+              <a href="#" onclick="handleResendConfirmationFromForm()"
+                >ارسال مجدد ایمیل تأیید</a
+              >
+            </p>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Sign Up Modal -->
+    <div
+      class="auth-overlay"
+      id="signUpOverlay"
+      onclick="closeAuthModal('signUp')"
+    >
+      <div class="auth-modal" onclick="event.stopPropagation()">
+        <div class="auth-header">
+          <h2>ایجاد حساب کاربری</h2>
+          <button class="close-auth" onclick="closeAuthModal('signUp')">
+            ×
+          </button>
+        </div>
+        <form class="auth-form" id="signUpForm" onsubmit="handleSignUp(event)">
+          <div class="form-group">
+            <label for="signUpName">نام و نام خانوادگی</label>
+            <input type="text" id="signUpName" name="fullName" required />
+          </div>
+          <div class="form-group">
+            <label for="signUpEmail">ایمیل</label>
+            <input type="email" id="signUpEmail" name="email" required />
+          </div>
+          <div class="form-group">
+            <label for="signUpPassword">رمز عبور</label>
+            <div class="password-input-container">
+              <input
+                type="password"
+                id="signUpPassword"
+                name="password"
+                required
+                minlength="6"
+              />
+              <button
+                type="button"
+                class="password-toggle"
+                onclick="togglePasswordVisibility('signUpPassword', this)"
+              >
+                <svg
+                  class="eye-icon"
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                >
+                  <path
+                    d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"
+                    fill="currentColor"
+                  />
+                </svg>
+              </button>
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="signUpConfirmPassword">تکرار رمز عبور</label>
+            <div class="password-input-container">
+              <input
+                type="password"
+                id="signUpConfirmPassword"
+                name="confirmPassword"
+                required
+              />
+              <button
+                type="button"
+                class="password-toggle"
+                onclick="togglePasswordVisibility('signUpConfirmPassword', this)"
+              >
+                <svg
+                  class="eye-icon"
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                >
+                  <path
+                    d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"
+                    fill="currentColor"
+                  />
+                </svg>
+              </button>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="checkbox-label">
+              <input type="checkbox" name="terms" required />
+              <span>قوانین و مقررات را می‌پذیرم</span>
+            </label>
+          </div>
+          <button type="submit" class="btn btn-primary btn-full">
+            <span id="signUpText">ثبت نام</span>
+            <span id="signUpLoading" style="display: none"
+              >در حال ثبت نام...</span
+            >
+          </button>
+          <div class="auth-footer">
+            <p>
+              قبلاً ثبت نام کرده‌اید؟
+              <a href="#" onclick="switchAuthModal('signIn')">وارد شوید</a>
+            </p>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Page Header -->
+    <section class="page-header contact-hero">
+      <div class="container">
+        <h1>تماس با ما</h1>
+        <p>ما آماده پاسخگویی به سوالات و نیازهای شما هستیم</p>
+      </div>
+    </section>
+
+    <!-- Main Content -->
+    <main class="page-content">
+      <div class="container">
+        <!-- Contact Info Section -->
+        <section class="contact-info-section">
+          <div class="contact-cards">
+            <div class="contact-card">
+              <div class="contact-icon">📞</div>
+              <h3>تلفن</h3>
+              <p>۰۹۰۳۶۰۰۶۰۳۵</p>
+              <p class="contact-hours">در دسترس 7:00 الی 18:00</p>
+            </div>
+
+            <div class="contact-card">
+              <div class="contact-icon">✉️</div>
+              <h3>ایمیل</h3>
+              <p>hesarimahdi261@gamil.com</p>
+              <p class="contact-hours">پاسخ در کمتر از 24 ساعت</p>
+            </div>
+
+            <div class="contact-card">
+              <div class="contact-icon">📍</div>
+              <h3>آدرس</h3>
+              <p>تهران، چیتگر</p>
+              <p class="contact-hours"></p>
+            </div>
+
+            <div class="contact-card">
+              <div class="contact-icon">🕐</div>
+              <h3>ساعات کاری</h3>
+              <p>شنبه تا پنجشنبه</p>
+              <p class="contact-hours">7:00 صبح الی 18:00 عصر</p>
+            </div>
+          </div>
+        </section>
+
+        <!-- Contact Form Section -->
+        <section class="contact-form-section">
+          <div class="contact-form-layout">
+            <div class="contact-form-intro">
+              <h2>پیام خود را ارسال کنید</h2>
+              <p>
+                فرم زیر را پر کنید و تیم ما در اسرع وقت با شما تماس خواهند گرفت.
+                لطفاً اطلاعات خود را به دقت وارد کنید.
+              </p>
+
+              <div class="contact-features">
+                <div class="contact-feature">
+                  <span class="feature-icon">✓</span>
+                  <p>پاسخ سریع در کمتر از 24 ساعت</p>
+                </div>
+                <div class="contact-feature">
+                  <span class="feature-icon">✓</span>
+                  <p>مشاوره رایگان</p>
+                </div>
+                <div class="contact-feature">
+                  <span class="feature-icon">✓</span>
+                  <p>پشتیبانی تخصصی</p>
+                </div>
+              </div>
+            </div>
+
+            <form
+              id="contactForm"
+              class="contact-form"
+              onsubmit="handleContactSubmit(event)"
+            >
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="name">نام و نام خانوادگی *</label>
+                  <input
+                    type="text"
+                    id="name"
+                    name="name"
+                    placeholder="نام خود را وارد کنید"
+                    required
+                  />
+                </div>
+
+                <div class="form-group">
+                  <label for="email">ایمیل *</label>
+                  <input
+                    type="email"
+                    id="email"
+                    name="email"
+                    placeholder="example@email.com"
+                    required
+                  />
+                </div>
+              </div>
+
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="phone">تلفن *</label>
+                  <input
+                    type="tel"
+                    id="phone"
+                    name="phone"
+                    placeholder="۰۹۱۲۳۴۵۶۷۸۹"
+                    required
+                  />
+                </div>
+
+                <div class="form-group">
+                  <label for="subject">موضوع *</label>
+                  <select id="subject" name="subject" required>
+                    <option value="">انتخاب کنید</option>
+                    <option value="گواهینامه">درخواست گواهینامه</option>
+                    <option value="مشاوره">مشاوره رایگان</option>
+                    <option value="پشتیبانی">پشتیبانی فنی</option>
+                    <option value="همکاری">همکاری</option>
+                    <option value="سایر">سایر موارد</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label for="message">پیام شما *</label>
+                <textarea
+                  id="message"
+                  name="message"
+                  rows="6"
+                  placeholder="پیام خود را اینجا بنویسید..."
+                  required
+                ></textarea>
+              </div>
+
+              <div class="form-group">
+                <label class="checkbox-label">
+                  <input type="checkbox" name="newsletter" value="yes" />
+                  <span>مایلم در خبرنامه عضو شوم</span>
+                </label>
+              </div>
+
+              <button
+                type="submit"
+                class="btn btn-primary btn-lg"
+                id="submitBtn"
+              >
+                <span id="submitText">ارسال پیام</span>
+                <span id="loadingSpinner" style="display: none"
+                  >در حال ارسال...</span
+                >
+              </button>
+            </form>
+          </div>
+        </section>
+
+        <!-- FAQ Section -->
+        <section class="faq-section">
+          <h2>سوالات متداول</h2>
+          <div class="faq-grid">
+            <div class="faq-item">
+              <h3>چطور می‌توانم درخواست گزارش دهم؟</h3>
+              <p>
+                برای درخواست گزارش، ابتدا باید حساب کاربری ایجاد کنید. سپس از
+                بخش خدمات، نوع گزارش مورد نظر خود را انتخاب کنید.
+              </p>
+            </div>
+
+            <div class="faq-item">
+              <h3>زمان پاسخگویی به درخواست‌ها چقدر است؟</h3>
+              <p>
+                ما معمولاً در کمتر از 24 ساعت به ایمیل‌ها و درخواست‌های شما پاسخ
+                می‌دهیم. برای موارد فوری می‌توانید تماس تلفنی بگیرید.
+              </p>
+            </div>
+
+            <div class="faq-item">
+              <h3>آیا مشاوره رایگان ارائه می‌دهید؟</h3>
+              <p>
+                بله، ما مشاوره اولیه رایگان برای تمام مشتریان ارائه می‌دهیم.
+                برای دریافت مشاوره با ما تماس بگیرید.
+              </p>
+            </div>
+
+            <div class="faq-item">
+              <h3>آیا امکان بازدید حضوری وجود دارد؟</h3>
+              <p>
+                بله، می‌توانید با هماهنگی قبلی به دفتر ما مراجعه کنید. لطفاً قبل
+                از مراجعه با ما تماس بگیرید.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        <!-- Map Section -->
+        <section class="map-section">
+          <h2>موقعیت ما روی نقشه</h2>
+          <div class="map-container">
+            <div class="map-placeholder">
+              <div class="map-icon">📍</div>
+              <p>نقشه اینجا نمایش داده می‌شود</p>
+              <p class="map-address">تهران، خیابان ولیعصر، پلاک ۱۲۳۴</p>
+            </div>
+          </div>
+        </section>
+
+        <!-- Alternative Contact Methods -->
+        <section class="alt-contact-section">
+          <h2>راه‌های دیگر ارتباطی</h2>
+          image.png
+          <div class="alt-contact-grid">
+            <div class="alt-contact-card">
+              <div class="alt-icon">📱</div>
+              <h3>پیامک</h3>
+              <p>ارسال پیام کوتاه به شماره</p>
+              <button class="btn btn-outline" onclick="handleToolAccess()">
+                ۰۹۰۳۶۰۰۶۰۳۵
+              </button>
+            </div>
+
+            <div class="alt-contact-card">
+              <div class="alt-icon">🎧</div>
+              <h3>پشتیبانی تلفنی</h3>
+              <p>تماس با مرکز پشتیبانی</p>
+              <button class="btn btn-outline" onclick="handleToolAccess()">
+                ۰۹۰۳۶۰۰۶۰۳۵
+              </button>
+            </div>
+
+            <div class="alt-contact-card">
+              <div class="alt-icon">📧</div>
+              <h3>خبرنامه</h3>
+              <p>عضویت در خبرنامه ایمیلی</p>
+              <button
+                class="btn btn-outline"
+                onclick="window.location.href='resources.html'"
+              >
+                عضویت
+              </button>
+            </div>
+          </div>
+        </section>
+
+        <!-- Social Media -->
+        <section class="social-section">
+          <h2>ما را در شبکه‌های اجتماعی دنبال کنید</h2>
+          <div class="social-grid">
+            <a
+              href="#"
+              class="social-card"
+              onclick="handleSocialClick('linkedin')"
+            >
+              <div class="social-icon">
+                <svg viewBox="0 0 24 24" fill="currentColor">
+                  <path
+                    d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"
+                  />
+                </svg>
+              </div>
+              <h3>لینکدین</h3>
+              <p>@BuildingInfo</p>
+            </a>
+
+            <a
+              href="#"
+              class="social-card"
+              onclick="handleSocialClick('instagram')"
+            >
+              <div class="social-icon">
+                <svg viewBox="0 0 24 24" fill="currentColor">
+                  <path
+                    d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"
+                  />
+                </svg>
+              </div>
+              <h3>اینستاگرام</h3>
+              <p>@BuildingInfo.ir</p>
+            </a>
+
+            <a
+              href="#"
+              class="social-card"
+              onclick="handleSocialClick('telegram')"
+            >
+              <div class="social-icon">
+                <svg viewBox="0 0 24 24" fill="currentColor">
+                  <path
+                    d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"
+                  />
+                </svg>
+              </div>
+              <h3>تلگرام</h3>
+              <p>@BuildingInfoChannel</p>
+            </a>
+          </div>
+        </section>
+      </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+      <div class="container">
+        <div class="footer-content">
+          <div class="footer-section">
+            <h3>مرکز سلامت ساختمانی</h3>
+            <p>
+              ارائه‌دهنده اطلاعات و خدمات تخصصی در زمینه ارزیابی خطرات املاک و
+              بیمه
+            </p>
+            <div class="social-links">
+              <a
+                href="#"
+                onclick="handleSocialClick('linkedin')"
+                title="LinkedIn"
+              >
+                <svg
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="currentColor"
+                >
+                  <path
+                    d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"
+                  />
+                </svg>
+              </a>
+              <a
+                href="#"
+                onclick="handleSocialClick('telegram')"
+                title="Telegram"
+              >
+                <svg
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="currentColor"
+                >
+                  <path
+                    d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"
+                  />
+                </svg>
+              </a>
+              <a
+                href="#"
+                onclick="handleSocialClick('instagram')"
+                title="Instagram"
+              >
+                <svg
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="currentColor"
+                >
+                  <path
+                    d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"
+                  />
+                </svg>
+              </a>
+            </div>
+          </div>
+
+          <div class="footer-section">
+            <h4>شرکت</h4>
+            <ul>
+              <li><a href="about.html">درباره ما</a></li>
+              <li>
+                <a href="#" onclick="handleFooterClick('careers')"
+                  >فرصت‌های شغلی</a
+                >
+              </li>
+              <li>
+                <a href="#" onclick="handleFooterClick('media')">رسانه</a>
+              </li>
+              <li>
+                <a href="#" onclick="handleFooterClick('privacy')"
+                  >حریم خصوصی</a
+                >
+              </li>
+              <li>
+                <a href="#" onclick="handleFooterClick('terms')"
+                  >شرایط استفاده</a
+                >
+              </li>
+            </ul>
+          </div>
+
+          <div class="footer-section">
+            <h4>منابع</h4>
+            <ul>
+              <li>
+                <a href="#" onclick="handleFooterClick('faq')">سوالات متداول</a>
+              </li>
+              <li>
+                <a href="#" onclick="handleFooterClick('help')">مرکز راهنما</a>
+              </li>
+              <li>
+                <a href="#" onclick="handleFooterClick('newsletter')"
+                  >خبرنامه</a
+                >
+              </li>
+              <li><a href="blog.html">وبلاگ</a></li>
+            </ul>
+          </div>
+
+          <div class="footer-section">
+            <h4>تماس با ما</h4>
+            <ul class="contact-info">
+              <li>تلفن: ۰۹۰۳۶۰۰۶۰۳۵</li>
+              <li>ایمیل: hesarimahdi261@gamil.com</li>
+              <li>ساعات کاری: 7:00 الی 18:00</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="footer-bottom">
+          <p>© ۱۴۰۴ مرکز سلامت ساختمانی. تمامی حقوق محفوظ است.</p>
+        </div>
+      </div>
+    </footer>
+
+    <script src="script.js"></script>
+    <script>
+      async function handleContactSubmit(event) {
+        event.preventDefault();
+
+        const formData = {
+          name: event.target.name.value,
+          email: event.target.email.value,
+          phone: event.target.phone.value,
+          subject: event.target.subject.value,
+          message: event.target.message.value,
+          newsletter: event.target.newsletter.checked,
+          timestamp: new Date().toISOString(),
+        };
+
+        try {
+          await makeApiRequest("/contact/submit", "POST", formData);
+
+          showNotification(
+            "پیام شما با موفقیت ارسال شد! به زودی با شما تماس خواهیم گرفت.",
+            "success"
+          );
+          event.target.reset();
+        } catch (error) {
+          console.error("Contact form error:", error);
+        }
+      }
+    </script>
+  </body>
+</html>
