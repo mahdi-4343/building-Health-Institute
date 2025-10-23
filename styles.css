@@ -5680,3 +5680,228 @@ body.explorer-active {
     margin-bottom: 16px;
   }
 }
+
+/* Competition Section Styles */
+.competition-section {
+  background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+  padding: 80px 40px;
+  margin: 60px 20px;
+  border-radius: 20px;
+  position: relative;
+  overflow: hidden;
+}
+
+.competition-section::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="trophy" x="0" y="0" width="20" height="20" patternUnits="userSpaceOnUse"><text x="10" y="15" text-anchor="middle" font-size="12" fill="%23e2e8f0">🏆</text></pattern></defs><rect width="100" height="100" fill="url(%23trophy)"/></svg>');
+  opacity: 0.1;
+  z-index: 1;
+}
+
+.competition-container {
+  position: relative;
+  z-index: 2;
+  padding: 0 20px;
+}
+
+.competition-header {
+  text-align: center;
+  margin-bottom: 60px;
+}
+
+.competition-header h2 {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 16px;
+  background: linear-gradient(135deg, var(--primary-color), #f59e0b);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.competition-subtitle {
+  font-size: 1.25rem;
+  color: var(--text-secondary);
+  font-weight: 500;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.competition-content {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 60px;
+  align-items: center;
+}
+
+.competition-text h3 {
+  font-size: 1.75rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 20px;
+}
+
+.competition-text p {
+  font-size: 1.1rem;
+  line-height: 1.8;
+  color: var(--text-secondary);
+  margin-bottom: 40px;
+}
+
+.achievement-stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 30px;
+}
+
+.achievement-stat {
+  text-align: center;
+  padding: 20px;
+  background: white;
+  border-radius: 16px;
+  box-shadow: var(--shadow-md);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.achievement-stat:hover {
+  transform: translateY(-5px);
+  box-shadow: var(--shadow-lg);
+}
+
+.achievement-stat .stat-number {
+  display: block;
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: var(--primary-color);
+  margin-bottom: 8px;
+}
+
+.achievement-stat .stat-label {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+.competition-images {
+  position: relative;
+}
+
+.image-gallery {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 20px;
+}
+
+.gallery-item {
+  position: relative;
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: var(--shadow-lg);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.gallery-item:hover {
+  transform: scale(1.02);
+  box-shadow: var(--shadow-xl);
+}
+
+.gallery-item img {
+  width: 100%;
+  height: 300px;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
+.gallery-item:hover img {
+  transform: scale(1.05);
+}
+
+.image-overlay {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: linear-gradient(transparent, rgba(0, 0, 0, 0.8));
+  color: white;
+  padding: 20px;
+  transform: translateY(100%);
+  transition: transform 0.3s ease;
+}
+
+.gallery-item:hover .image-overlay {
+  transform: translateY(0);
+}
+
+.image-overlay span {
+  font-size: 1.1rem;
+  font-weight: 600;
+  display: block;
+  text-align: center;
+}
+
+/* Responsive Design for Competition Section */
+@media (max-width: 768px) {
+  .competition-section {
+    padding: 60px 20px;
+    margin: 40px 10px;
+    border-radius: 16px;
+  }
+  
+  .competition-container {
+    padding: 0 10px;
+  }
+  
+  .competition-header {
+    margin-bottom: 40px;
+  }
+  
+  .competition-header h2 {
+    font-size: 2rem;
+  }
+  
+  .competition-subtitle {
+    font-size: 1.1rem;
+  }
+  
+  .competition-content {
+    grid-template-columns: 1fr;
+    gap: 40px;
+  }
+  
+  .achievement-stats {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+  
+  .achievement-stat .stat-number {
+    font-size: 2rem;
+  }
+  
+  .gallery-item img {
+    height: 250px;
+  }
+}
+
+@media (max-width: 480px) {
+  .competition-header h2 {
+    font-size: 1.75rem;
+  }
+  
+  .competition-text h3 {
+    font-size: 1.5rem;
+  }
+  
+  .competition-text p {
+    font-size: 1rem;
+  }
+  
+  .achievement-stat .stat-number {
+    font-size: 1.75rem;
+  }
+}
