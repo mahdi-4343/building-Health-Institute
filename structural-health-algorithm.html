@@ -1,0 +1,925 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>الگوریتم جامع ارزیابی سلامت سازه | مرکز سلامت ساختمانی</title>
+    <meta name="description" content="Comprehensive Algorithm for Structural Health Assessment of Concrete and Steel Structures - Building Health Institute" />
+    <link rel="stylesheet" href="styles.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="icon" type="image/png" href="Favicon.png" />
+    <link rel="shortcut icon" type="image/png" href="Favicon.png" />
+    <link rel="apple-touch-icon" href="Favicon.png" />
+
+    <!-- EmailJS and Supabase Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.3/dist/umd/supabase.js"></script>
+    <script src="config.js"></script>
+  </head>
+  <body>
+    <!-- Header -->
+    <header class="header">
+      <div class="container">
+        <div class="header-content">
+          <div class="search-icon" onclick="toggleSearch()">
+            <svg viewBox="0 0 24 24">
+              <path
+                d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"
+              />
+            </svg>
+          </div>
+          <div class="logo">
+            <a href="index.html">
+              <img
+                src="logo.png"
+                alt="Building Health Institute - BHI | مرکز سلامت ساختمانی"
+              />
+            </a>
+          </div>
+          <nav class="main-nav">
+            <ul>
+              <li><a href="index.html">خانه</a></li>
+              <li><a href="about.html">درباره ما</a></li>
+              <li><a href="services.html">خدمات</a></li>
+              <li><a href="certification.html">گواهینامه ها</a></li>
+              <li><a href="resources.html">منابع</a></li>
+              <li><a href="blog.html" class="active">وبلاگ</a></li>
+              <li><a href="contact.html">تماس</a></li>
+            </ul>
+          </nav>
+          <div class="header-actions">
+            <button class="btn btn-outline" onclick="openAuthModal('signIn')">
+              ورود
+            </button>
+            <button class="btn btn-primary" onclick="openAuthModal('signUp')">
+              ایجاد حساب
+            </button>
+          </div>
+
+          <!-- Hamburger Menu for Mobile -->
+          <div class="hamburger-menu" onclick="toggleMobileMenu()">
+            <span></span>
+            <span></span>
+            <span></span>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Mobile Navigation Overlay -->
+    <div
+      class="mobile-nav-overlay"
+      id="mobileNavOverlay"
+      onclick="closeMobileMenu()"
+    >
+      <div class="mobile-nav-menu" onclick="event.stopPropagation()">
+        <div class="mobile-nav-header">
+          <div class="logo">
+            <img src="logo.png" alt="مرکز سلامت ساختمانی" />
+          </div>
+          <button class="close-mobile-nav" onclick="closeMobileMenu()">
+            <svg viewBox="0 0 24 24">
+              <path
+                d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"
+              />
+            </svg>
+          </button>
+        </div>
+        <nav class="mobile-nav">
+          <ul>
+            <li><a href="index.html" onclick="closeMobileMenu()">خانه</a></li>
+            <li>
+              <a href="about.html" onclick="closeMobileMenu()">درباره ما</a>
+            </li>
+            <li>
+              <a href="services.html" onclick="closeMobileMenu()">خدمات</a>
+            </li>
+            <li>
+              <a href="certification.html" onclick="closeMobileMenu()"
+                >گواهینامه ها</a
+              >
+            </li>
+            <li>
+              <a href="resources.html" onclick="closeMobileMenu()">منابع</a>
+            </li>
+            <li><a href="blog.html" onclick="closeMobileMenu()">وبلاگ</a></li>
+            <li><a href="contact.html" onclick="closeMobileMenu()">تماس</a></li>
+          </ul>
+        </nav>
+        <div class="mobile-nav-actions">
+          <button
+            class="btn btn-outline mobile-btn"
+            onclick="openAuthModal('signIn'); closeMobileMenu();"
+          >
+            ورود
+          </button>
+          <button
+            class="btn btn-primary mobile-btn"
+            onclick="openAuthModal('signUp'); closeMobileMenu();"
+          >
+            ایجاد حساب
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Search Overlay -->
+    <div class="search-overlay" id="searchOverlay" onclick="closeSearch()">
+      <div class="search-container" onclick="event.stopPropagation()">
+        <div class="search-header">
+          <h3>جستجو در وب‌سایت</h3>
+          <button class="close-search" onclick="closeSearch()">×</button>
+        </div>
+        <div class="search-input-container">
+          <input
+            type="text"
+            id="searchInput"
+            placeholder="جستجو کنید..."
+            autocomplete="off"
+          />
+          <button class="search-btn" onclick="performSearch()">
+            <svg viewBox="0 0 24 24">
+              <path
+                d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"
+              />
+            </svg>
+          </button>
+        </div>
+        <div class="search-suggestions" id="searchSuggestions">
+          <div class="suggestion-category">
+            <h4>جستجوهای محبوب</h4>
+            <ul>
+              <li onclick="searchFor('زلزله')">زلزله</li>
+              <li onclick="searchFor('گواهینامه')">گواهینامه</li>
+              <li onclick="searchFor('بیمه')">بیمه</li>
+              <li onclick="searchFor('ارزیابی')">ارزیابی</li>
+            </ul>
+          </div>
+          <div class="suggestion-category">
+            <h4>دسته‌بندی‌ها</h4>
+            <ul>
+              <li onclick="searchFor('طبقه بندی زلزله')">طبقه بندی زلزله</li>
+              <li onclick="searchFor('کدهای ساختمانی')">کدهای ساختمانی</li>
+              <li onclick="searchFor('ارزیابی خطر')">ارزیابی خطر</li>
+              <li onclick="searchFor('آتش سوزی')">آتش سوزی</li>
+            </ul>
+          </div>
+        </div>
+        <div class="search-results" id="searchResults"></div>
+      </div>
+    </div>
+
+    <!-- Authentication Modals -->
+    <!-- Sign In Modal -->
+    <div
+      class="auth-overlay"
+      id="signInOverlay"
+      onclick="closeAuthModal('signIn')"
+    >
+      <div class="auth-modal" onclick="event.stopPropagation()">
+        <div class="auth-header">
+          <h2>ورود به حساب کاربری</h2>
+          <button class="close-auth" onclick="closeAuthModal('signIn')">
+            ×
+          </button>
+        </div>
+        <form class="auth-form" id="signInForm" onsubmit="handleSignIn(event)">
+          <div class="form-group">
+            <label for="signInEmail">ایمیل</label>
+            <input type="email" id="signInEmail" name="email" required />
+          </div>
+          <div class="form-group">
+            <label for="signInPassword">رمز عبور</label>
+            <div class="password-input-container">
+              <input
+                type="password"
+                id="signInPassword"
+                name="password"
+                required
+              />
+              <button
+                type="button"
+                class="password-toggle"
+                onclick="togglePasswordVisibility('signInPassword', this)"
+              >
+                <svg
+                  class="eye-icon"
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                >
+                  <path
+                    d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"
+                    fill="currentColor"
+                  />
+                </svg>
+              </button>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="checkbox-label">
+              <input type="checkbox" name="remember" />
+              <span>مرا به خاطر بسپار</span>
+            </label>
+          </div>
+          <button type="submit" class="btn btn-primary btn-full">
+            <span id="signInText">ورود</span>
+            <span id="signInLoading" style="display: none">در حال ورود...</span>
+          </button>
+          <div class="auth-footer">
+            <p>
+              حساب کاربری ندارید؟
+              <a href="#" onclick="switchAuthModal('signUp')">ثبت نام کنید</a>
+            </p>
+            <p>
+              <a href="#" onclick="handleForgotPassword()">فراموشی رمز عبور</a>
+            </p>
+            <p>
+              <a href="#" onclick="handleResendConfirmationFromForm()"
+                >ارسال مجدد ایمیل تأیید</a
+              >
+            </p>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Sign Up Modal -->
+    <div
+      class="auth-overlay"
+      id="signUpOverlay"
+      onclick="closeAuthModal('signUp')"
+    >
+      <div class="auth-modal" onclick="event.stopPropagation()">
+        <div class="auth-header">
+          <h2>ایجاد حساب کاربری</h2>
+          <button class="close-auth" onclick="closeAuthModal('signUp')">
+            ×
+          </button>
+        </div>
+        <form class="auth-form" id="signUpForm" onsubmit="handleSignUp(event)">
+          <div class="form-group">
+            <label for="signUpName">نام و نام خانوادگی</label>
+            <input type="text" id="signUpName" name="fullName" required />
+          </div>
+          <div class="form-group">
+            <label for="signUpEmail">ایمیل</label>
+            <input type="email" id="signUpEmail" name="email" required />
+          </div>
+          <div class="form-group">
+            <label for="signUpPassword">رمز عبور</label>
+            <div class="password-input-container">
+              <input
+                type="password"
+                id="signUpPassword"
+                name="password"
+                required
+                minlength="6"
+              />
+              <button
+                type="button"
+                class="password-toggle"
+                onclick="togglePasswordVisibility('signUpPassword', this)"
+              >
+                <svg
+                  class="eye-icon"
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                >
+                  <path
+                    d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"
+                    fill="currentColor"
+                  />
+                </svg>
+              </button>
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="signUpConfirmPassword">تکرار رمز عبور</label>
+            <div class="password-input-container">
+              <input
+                type="password"
+                id="signUpConfirmPassword"
+                name="confirmPassword"
+                required
+              />
+              <button
+                type="button"
+                class="password-toggle"
+                onclick="togglePasswordVisibility('signUpConfirmPassword', this)"
+              >
+                <svg
+                  class="eye-icon"
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                >
+                  <path
+                    d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"
+                    fill="currentColor"
+                  />
+                </svg>
+              </button>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="checkbox-label">
+              <input type="checkbox" name="terms" required />
+              <span>قوانین و مقررات را می‌پذیرم</span>
+            </label>
+          </div>
+          <button type="submit" class="btn btn-primary btn-full">
+            <span id="signUpText">ثبت نام</span>
+            <span id="signUpLoading" style="display: none"
+              >در حال ثبت نام...</span
+            >
+          </button>
+          <div class="auth-footer">
+            <p>
+              قبلاً ثبت نام کرده‌اید؟
+              <a href="#" onclick="switchAuthModal('signIn')">وارد شوید</a>
+            </p>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Breadcrumb -->
+    <div class="breadcrumb">
+      <div class="container">
+        <a href="index.html">خانه</a>
+        <span class="separator">/</span>
+        <a href="blog.html">وبلاگ</a>
+        <span class="separator">/</span>
+        <span class="current">الگوریتم جامع ارزیابی سلامت سازه</span>
+      </div>
+    </div>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      <div class="container">
+        <article class="article">
+          <!-- Article Header -->
+          <header class="article-header">
+            <div class="article-meta">
+              <span class="category">ارزیابی سازه</span>
+              <span class="separator">|</span>
+              <span class="category">مهندسی سازه</span>
+              <span class="reading-time">زمان مطالعه: ۱۵ دقیقه</span>
+            </div>
+            <h1 class="article-title">
+              الگوریتم جامع ارزیابی سلامت سازه‌های بتنی و فولادی
+            </h1>
+            <div class="article-info">
+              <div class="author-info">
+                <img
+                  src="staff's/mahdi hesari.jpg"
+                  alt="نویسنده"
+                  class="author-avatar"
+                />
+                <div>
+                  <p class="author-name">مرکز سلامت ساختمانی</p>
+                  <p class="publish-date">۱۴۰۴</p>
+                </div>
+              </div>
+            </div>
+          </header>
+
+          <!-- Featured Image -->
+          <div class="featured-image">
+            <img
+              src="https://images.unsplash.com/photo-1581092160562-40aa08e78837?w=1200&h=600&fit=crop"
+              alt="ارزیابی سلامت سازه"
+            />
+            <p class="image-caption">
+              الگوریتم جامع ارزیابی سلامت سازه‌های بتنی و فولادی - مرکز سلامت ساختمانی
+            </p>
+          </div>
+
+          <!-- Article Content -->
+          <div class="article-content">
+            <p class="lead">
+              ارزیابی سلامت سازه یکی از مهم‌ترین جنبه‌های ایمنی و پایداری ساختمان‌ها است. 
+              در دنیای امروز که ساختمان‌ها به عنوان سرمایه‌های کلان اقتصادی و اجتماعی محسوب می‌شوند، 
+              نیاز به سیستم‌های استاندارد و قابل اعتماد برای ارزیابی سلامت سازه‌های بتنی و فولادی 
+              بیش از پیش احساس می‌شود.
+            </p>
+            <p>
+              این الگوریتم جامع که توسط <strong>مرکز سلامت ساختمانی</strong> توسعه یافته است، 
+              یک رویکرد سیستماتیک و علمی برای ارزیابی سلامت سازه‌ها ارائه می‌دهد. این سیستم 
+              با استفاده از روش‌های پیشرفته بازرسی، آزمایش‌های غیرمخرب و تحلیل‌های مهندسی، 
+              امکان ارزیابی دقیق و قابل اعتماد سلامت سازه‌ها را فراهم می‌کند.
+            </p>
+            <p>
+              هدف اصلی این الگوریتم، ارائه یک فرآیند استاندارد و شفاف برای تصمیم‌گیری در مورد 
+              وضعیت سازه‌ها است که می‌تواند به سرمایه‌گذاران، مهندسان، و سازمان‌های دولتی 
+              کمک کند تا تصمیم‌های آگاهانه‌تری در مورد تعمیر، مقاوم‌سازی، یا تخریب سازه‌ها بگیرند.
+            </p>
+
+        <!-- Algorithm Flowchart -->
+        <section class="algorithm-flowchart">
+          <h2 style="text-align: center; margin-bottom: 2rem;">نمودار جریان الگوریتم</h2>
+          <div style="display: flex; justify-content: center; align-items: center;">
+            <svg width="100%" height="600" viewBox="0 0 1000 600" style="max-width: 100%;">
+              <!-- Background -->
+              <rect width="1000" height="600" fill="#f8fafc" rx="10"/>
+              
+              <!-- Phase 0 -->
+              <rect x="50" y="50" width="150" height="80" rx="10" fill="#2563eb" stroke="#1d4ed8" stroke-width="2"/>
+              <text x="125" y="95" text-anchor="middle" fill="white" font-size="14" font-weight="bold">Phase 0</text>
+              <text x="125" y="115" text-anchor="middle" fill="white" font-size="12">Mission</text>
+              <text x="125" y="130" text-anchor="middle" fill="white" font-size="12">Preparation</text>
+              
+              <!-- Arrow 0->1 -->
+              <path d="M 200 90 L 250 90" stroke="#2563eb" stroke-width="3" marker-end="url(#arrowhead)"/>
+              
+              <!-- Phase 1 -->
+              <rect x="250" y="50" width="150" height="80" rx="10" fill="#2563eb" stroke="#1d4ed8" stroke-width="2"/>
+              <text x="325" y="95" text-anchor="middle" fill="white" font-size="14" font-weight="bold">Phase 1</text>
+              <text x="325" y="115" text-anchor="middle" fill="white" font-size="12">Visual</text>
+              <text x="325" y="130" text-anchor="middle" fill="white" font-size="12">Inspection</text>
+              
+              <!-- Arrow 1->2 -->
+              <path d="M 400 90 L 450 90" stroke="#2563eb" stroke-width="3" marker-end="url(#arrowhead)"/>
+              
+              <!-- Phase 2 -->
+              <rect x="450" y="50" width="150" height="80" rx="10" fill="#2563eb" stroke="#1d4ed8" stroke-width="2"/>
+              <text x="525" y="95" text-anchor="middle" fill="white" font-size="14" font-weight="bold">Phase 2</text>
+              <text x="525" y="115" text-anchor="middle" fill="white" font-size="12">General</text>
+              <text x="525" y="130" text-anchor="middle" fill="white" font-size="12">Screening</text>
+              
+              <!-- Arrow 2->3 -->
+              <path d="M 600 90 L 650 90" stroke="#2563eb" stroke-width="3" marker-end="url(#arrowhead)"/>
+              
+              <!-- Phase 3 -->
+              <rect x="650" y="50" width="150" height="80" rx="10" fill="#2563eb" stroke="#1d4ed8" stroke-width="2"/>
+              <text x="725" y="95" text-anchor="middle" fill="white" font-size="14" font-weight="bold">Phase 3</text>
+              <text x="725" y="115" text-anchor="middle" fill="white" font-size="12">Detailed</text>
+              <text x="725" y="130" text-anchor="middle" fill="white" font-size="12">Diagnostics</text>
+              
+              <!-- Arrow 3->4 (down) -->
+              <path d="M 725 130 L 725 200" stroke="#2563eb" stroke-width="3" marker-end="url(#arrowhead)"/>
+              
+              <!-- Phase 4 -->
+              <rect x="600" y="200" width="250" height="80" rx="10" fill="#10b981" stroke="#059669" stroke-width="2"/>
+              <text x="725" y="235" text-anchor="middle" fill="white" font-size="14" font-weight="bold">Phase 4: Analytical Evaluation</text>
+              <text x="725" y="255" text-anchor="middle" fill="white" font-size="12">Structural Health Index (SHI)</text>
+              <text x="725" y="270" text-anchor="middle" fill="white" font-size="12">Calculation & Interpretation</text>
+              
+              <!-- Arrow 4->5 (down) -->
+              <path d="M 725 280 L 725 350" stroke="#10b981" stroke-width="3" marker-end="url(#arrowhead)"/>
+              
+              <!-- Phase 5 -->
+              <rect x="600" y="350" width="250" height="80" rx="10" fill="#2563eb" stroke="#1d4ed8" stroke-width="2"/>
+              <text x="725" y="385" text-anchor="middle" fill="white" font-size="14" font-weight="bold">Phase 5</text>
+              <text x="725" y="405" text-anchor="middle" fill="white" font-size="12">Reporting &</text>
+              <text x="725" y="420" text-anchor="middle" fill="white" font-size="12">Recommendations</text>
+              
+              <!-- Arrow 5->6 (down) -->
+              <path d="M 725 430 L 725 500" stroke="#2563eb" stroke-width="3" marker-end="url(#arrowhead)"/>
+              
+              <!-- Phase 6 -->
+              <rect x="600" y="500" width="250" height="80" rx="10" fill="#f59e0b" stroke="#d97706" stroke-width="2"/>
+              <text x="725" y="535" text-anchor="middle" fill="white" font-size="14" font-weight="bold">Phase 6</text>
+              <text x="725" y="555" text-anchor="middle" fill="white" font-size="12">Smart Monitoring</text>
+              <text x="725" y="570" text-anchor="middle" fill="white" font-size="12">& Maintenance</text>
+              
+              <!-- Arrowhead marker -->
+              <defs>
+                <marker id="arrowhead" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+                  <polygon points="0 0, 10 3, 0 6" fill="#2563eb"/>
+                </marker>
+              </defs>
+            </svg>
+          </div>
+        </section>
+
+        <section class="algorithm-section">
+          <h2>۱. مرحله جمع‌آوری اطلاعات پایه</h2>
+          <p>در گام اول داده‌های عمومی و بستر پروژه ثبت می‌شود تا تصویر دقیقی از وضعیت اولیه سازه به دست آید.</p>
+          <ul style="list-style: none; padding-right: 1.5rem;">
+            <li style="margin-bottom: 0.75rem;">✓ نوع سازه (بتنی / فولادی) و تعداد طبقات</li>
+            <li style="margin-bottom: 0.75rem;">✓ قدمت، سال ساخت، تاریخ آخرین بازسازی و دفعات تعمیرات ۱۰ سال اخیر</li>
+            <li style="margin-bottom: 0.75rem;">✓ وجود نقشه‌های مهندسی مصوب و حضور مجری ذی‌صلاح</li>
+            <li style="margin-bottom: 0.75rem;">✓ نوع خاک، فاصله تا گسل فعال و منطقه لرزه‌خیزی</li>
+            <li style="margin-bottom: 0.75rem;">✓ نوع سیستم باربر جانبی، نوع سقف و نوع/عمق فنداسیون</li>
+            <li style="margin-bottom: 0.75rem;">✓ سابقه مقاوم‌سازی، تغییر کاربری یا اضافه طبقه و بارگذاری‌های اضافی (مخزن آب، تجهیزات)</li>
+            <li style="margin-bottom: 0.75rem;">✓ وضعیت زهکشی و آب‌بندی فنداسیون و شرایط محیطی (رطوبت، آب زیرزمینی)</li>
+          </ul>
+        </section>
+
+        <section class="algorithm-section">
+          <h2>۲. بازرسی چشمی و میدانی</h2>
+          <p>بازرس میدانی وضعیت ظاهری و تغییرشکل‌های سازه را به صورت سیستماتیک پایش می‌کند.</p>
+          <ul style="list-style: none; padding-right: 1.5rem;">
+            <li style="margin-bottom: 0.75rem;">✓ بررسی ترک‌ها (مویی، افقی، برشی) و تطبیق ابعاد المان‌ها با نقشه‌ها</li>
+            <li style="margin-bottom: 0.75rem;">✓ مشاهده خوردگی میلگرد، زنگ‌زدگی فولاد یا پوسته شدن بتن</li>
+            <li style="margin-bottom: 0.75rem;">✓ پایش خیز تیرها، تغییر شکل کف‌ها و عملکرد درهای داخلی (نشست احتمالی)</li>
+            <li style="margin-bottom: 0.75rem;">✓ ثبت آثار نشست موضعی، ترک در دیوارهای باربر و تغییر تراز کف‌ها</li>
+            <li style="margin-bottom: 0.75rem;">✓ رصد نم‌زدگی، نشت رطوبت در طبقات پایین و ارزیابی وضعیت زهکشی</li>
+            <li style="margin-bottom: 0.75rem;">✓ مستندسازی تصویری (Photo Log) با ژئوتگ و درجه‌بندی شدت آسیب</li>
+          </ul>
+          <div class="info-box" style="margin-top: 1.5rem;">
+            <h3>امتیازدهی بازرسی چشمی</h3>
+            <p>✅ سالم (۱۰۰) &nbsp;&nbsp; ⚠️ متوسط (۶۰) &nbsp;&nbsp; ❌ شدید (۳۰)</p>
+          </div>
+        </section>
+
+        <section class="algorithm-section">
+          <h2>۳. ارزیابی سیستم سازه‌ای</h2>
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr>
+                  <th>پارامتر</th>
+                  <th>شرح</th>
+                  <th>خوب (۱۰۰)</th>
+                  <th>متوسط (۷۰)</th>
+                  <th>ضعیف (۴۰)</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>سیستم باربر جانبی</td>
+                  <td>نوع قاب یا دیوارهای برشی</td>
+                  <td>قاب خمشی یا دیوار برشی کامل</td>
+                  <td>سیستم ناقص یا ترکیبی</td>
+                  <td>فاقد سیستم مؤثر</td>
+                </tr>
+                <tr>
+                  <td>فنداسیون</td>
+                  <td>نوع و پیوستگی فنداسیون</td>
+                  <td>رادیه یا شمع‌دار</td>
+                  <td>نواری یا ترکیبی</td>
+                  <td>منفرد یا نامناسب</td>
+                </tr>
+                <tr>
+                  <td>نوع سقف</td>
+                  <td>یکپارچگی و صلبیت دیافراگم</td>
+                  <td>یکپارچه و صلب</td>
+                  <td>ترکیبی</td>
+                  <td>ضعیف یا غیرسازه‌ای</td>
+                </tr>
+                <tr>
+                  <td>نقشه‌های سازه‌ای</td>
+                  <td>میزان کامل بودن مستندات</td>
+                  <td>کامل و مورد تایید</td>
+                  <td>ناقص</td>
+                  <td>فاقد نقشه</td>
+                </tr>
+                <tr>
+                  <td>مقاوم‌سازی</td>
+                  <td>اجرای تمهیدات تقویتی</td>
+                  <td>انجام شده</td>
+                  <td>در حال برنامه‌ریزی</td>
+                  <td>انجام نشده</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <section class="algorithm-section">
+          <h2>۴. نتایج تست‌های غیرمخرب (NDT)</h2>
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr>
+                  <th>نوع تست</th>
+                  <th>محدوده مطلوب</th>
+                  <th>امتیازدهی</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>چکش اشمیت</td>
+                  <td>&gt; ۲۵ MPa</td>
+                  <td>بالا: ۱۰۰ &nbsp; | &nbsp; پایین ۱۵ MPa: ۴۰</td>
+                </tr>
+                <tr>
+                  <td>سرعت پالس التراسونیک (UPV)</td>
+                  <td>&gt; ۴۰۰۰ m/s</td>
+                  <td>بالا: ۱۰۰ &nbsp; | &nbsp; پایین ۳۰۰۰ m/s: ۴۰</td>
+                </tr>
+                <tr>
+                  <td>Pull-Off</td>
+                  <td>&gt; ۱.۵ MPa</td>
+                  <td>بالا: ۱۰۰ &nbsp; | &nbsp; زیر ۰.۸ MPa: ۴۰</td>
+                </tr>
+                <tr>
+                  <td>پتانسیل خوردگی (Half-Cell)</td>
+                  <td>&gt; -۲۰۰ mV</td>
+                  <td>بالا: ۱۰۰ &nbsp; | &nbsp; پایین -۳۵۰ mV: ۴۰</td>
+                </tr>
+                <tr>
+                  <td>عمق پوشش میلگرد</td>
+                  <td>≥ ۳۰ mm</td>
+                  <td>بالا: ۱۰۰ &nbsp; | &nbsp; زیر ۱۵ mm: ۵۰</td>
+                </tr>
+                <tr>
+                  <td>ارزیابی خوردگی بتن/فولاد</td>
+                  <td>فاقد خوردگی</td>
+                  <td>فاقد خوردگی: ۱۰۰ &nbsp; | &nbsp; شدید: ۴۰</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <section class="algorithm-section">
+          <h2>۵. شرایط محیطی و ریسک‌های محل ساخت</h2>
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr>
+                  <th>عامل محیطی</th>
+                  <th>توضیح</th>
+                  <th>امتیاز پیشنهادی</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>فاصله از گسل فعال</td>
+                  <td>&lt;۵km = ریسک بالا</td>
+                  <td>۵۰ / ۸۰ / ۱۰۰ (کمتر تا بیشتر از ۲۰ کیلومتر)</td>
+                </tr>
+                <tr>
+                  <td>نوع خاک</td>
+                  <td>سنگی، شنی، رسی</td>
+                  <td>سنگی: ۱۰۰ &nbsp; | &nbsp; شنی: ۸۰ &nbsp; | &nbsp; رسی: ۶۰</td>
+                </tr>
+                <tr>
+                  <td>منطقه لرزه‌خیزی</td>
+                  <td>کم، متوسط، زیاد</td>
+                  <td>کم: ۱۰۰ &nbsp; | &nbsp; متوسط: ۸۰ &nbsp; | &nbsp; زیاد: ۶۰</td>
+                </tr>
+                <tr>
+                  <td>لرزش یا ارتعاش محیطی</td>
+                  <td>فعالیت صنعتی یا ترافیکی</td>
+                  <td>ندارد: ۱۰۰ &nbsp; | &nbsp; متوسط: ۸۰ &nbsp; | &nbsp; زیاد: ۵۰</td>
+                </tr>
+                <tr>
+                  <td>رطوبت و آب زیرزمینی</td>
+                  <td>پایداری شرایط فنداسیون</td>
+                  <td>خشک: ۱۰۰ &nbsp; | &nbsp; مرطوب: ۷۰ &nbsp; | &nbsp; اشباع: ۵۰</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <section class="algorithm-section">
+          <h2>۶. نگهداری و سابقه بهره‌برداری</h2>
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr>
+                  <th>مورد بازرسی</th>
+                  <th>عالی (۱۰۰)</th>
+                  <th>متوسط (۷۰)</th>
+                  <th>ضعیف (۴۰)</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>شدت ترک‌ها</td>
+                  <td>فاقد ترک</td>
+                  <td>ترک‌های سطحی</td>
+                  <td>ترک‌های گسترده</td>
+                </tr>
+                <tr>
+                  <td>خوردگی فولاد یا میلگرد</td>
+                  <td>فاقد خوردگی</td>
+                  <td>موضعی</td>
+                  <td>گسترده</td>
+                </tr>
+                <tr>
+                  <td>تغییر شکل سازه</td>
+                  <td>بدون تغییر شکل</td>
+                  <td>قابل مشاهده</td>
+                  <td>قابل توجه</td>
+                </tr>
+                <tr>
+                  <td>نشانه‌های نشست</td>
+                  <td>فاقد نشست</td>
+                  <td>نشست جزئی</td>
+                  <td>نشست محسوس</td>
+                </tr>
+                <tr>
+                  <td>سابقه تعمیر/مرمت</td>
+                  <td>مرمت اخیر</td>
+                  <td>۵–۱۰ سال</td>
+                  <td>&gt;۱۰ سال</td>
+                </tr>
+                <tr>
+                  <td>زهکشی و عایق‌بندی</td>
+                  <td>عملکرد مناسب</td>
+                  <td>متوسط</td>
+                  <td>نامطلوب</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <section class="algorithm-section">
+          <h2>۷. محاسبه شاخص سلامت سازه (BHI)</h2>
+          <div class="shi-formula">
+            <p style="margin-bottom: 1rem; font-size: 1.2rem; font-weight: bold;">Building Health Index (BHI)</p>
+            <code>
+              BHI = (0.25×سیستم سازه‌ای)
+              + (0.25×تست‌های غیرمخرب)
+              + (0.20×بازرسی چشمی)
+              + (0.15×شرایط محیطی)
+              + (0.10×سابقه نگهداری)
+              + (0.05×جزئیات ساخت)
+            </code>
+            <p style="margin-top: 1rem; font-size: 0.9rem; opacity: 0.9;">هر پارامتر در بازه ۰ تا ۱۰۰ نمره‌گذاری می‌شود و مجموع وزن‌دار شاخص سلامت نهایی را تشکیل می‌دهد.</p>
+          </div>
+
+          <div class="interpretation-table">
+            <h3 style="margin-bottom: 1.5rem;">۸. تفسیر شاخص سلامت (BHI)</h3>
+            <div class="table-wrapper">
+              <table>
+                <thead>
+                  <tr>
+                    <th>امتیاز</th>
+                    <th>وضعیت سازه</th>
+                    <th>اقدام پیشنهادی</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>۹۰ – ۱۰۰</td>
+                    <td><span class="action-badge badge-excellent">عالی</span></td>
+                    <td>پایش دوره‌ای هر دو سال</td>
+                  </tr>
+                  <tr>
+                    <td>۷۰ – ۸۹</td>
+                    <td><span class="action-badge badge-moderate">متوسط</span></td>
+                    <td>تعمیر موضعی و بررسی سالانه</td>
+                  </tr>
+                  <tr>
+                    <td>۵۰ – ۶۹</td>
+                    <td><span class="action-badge badge-weak">ضعیف</span></td>
+                    <td>ضرورت مقاوم‌سازی یا ترمیم اساسی</td>
+                  </tr>
+                  <tr>
+                    <td>&lt; ۵۰</td>
+                    <td><span class="action-badge badge-critical">بحرانی</span></td>
+                    <td>تخلیه فوری و بازطراحی سازه</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <section class="algorithm-section">
+          <h2>۹. خروجی دیجیتال و گزارش</h2>
+          <ul style="list-style: none; padding-right: 1.5rem;">
+            <li style="margin-bottom: 0.75rem;">✓ ارائه داشبورد رنگی سلامت سازه (سبز، زرد، قرمز)</li>
+            <li style="margin-bottom: 0.75rem;">✓ تولید گزارش PDF شامل عکس‌ها، نمودارها، داده‌های تست و توصیه‌های فنی</li>
+            <li style="margin-bottom: 0.75rem;">✓ پیشنهاد خودکار برای تعمیر، مقاوم‌سازی یا بازسازی</li>
+            <li style="margin-bottom: 0.75rem;">✓ امکان اتصال به حسگرهای IoT جهت پایش رطوبت، لرزش و خوردگی</li>
+          </ul>
+        </section>
+
+          </div>
+        </article>
+      </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+      <div class="container">
+        <div class="footer-content">
+          <div class="footer-section">
+            <h3>مرکز سلامت ساختمانی</h3>
+            <p>
+              ارائه‌دهنده اطلاعات و خدمات تخصصی در زمینه ارزیابی خطرات املاک و
+              بیمه
+            </p>
+            <div class="social-links">
+              <a
+                href="#"
+                onclick="handleSocialClick('linkedin')"
+                title="LinkedIn"
+              >
+                <svg
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="currentColor"
+                >
+                  <path
+                    d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"
+                  />
+                </svg>
+              </a>
+              <a
+                href="#"
+                onclick="handleSocialClick('telegram')"
+                title="Telegram"
+              >
+                <svg
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="currentColor"
+                >
+                  <path
+                    d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"
+                  />
+                </svg>
+              </a>
+              <a
+                href="#"
+                onclick="handleSocialClick('instagram')"
+                title="Instagram"
+              >
+                <svg
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="currentColor"
+                >
+                  <path
+                    d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"
+                  />
+                </svg>
+              </a>
+            </div>
+          </div>
+
+          <div class="footer-section">
+            <h4>شرکت</h4>
+            <ul>
+              <li><a href="about.html">درباره ما</a></li>
+              <li>
+                <a href="#" onclick="handleFooterClick('careers')"
+                  >فرصت‌های شغلی</a
+                >
+              </li>
+              <li>
+                <a href="#" onclick="handleFooterClick('media')">رسانه</a>
+              </li>
+              <li>
+                <a href="#" onclick="handleFooterClick('privacy')"
+                  >حریم خصوصی</a
+                >
+              </li>
+              <li>
+                <a href="#" onclick="handleFooterClick('terms')"
+                  >شرایط استفاده</a
+                >
+              </li>
+            </ul>
+          </div>
+
+          <div class="footer-section">
+            <h4>منابع</h4>
+            <ul>
+              <li>
+                <a href="#" onclick="handleFooterClick('faq')">سوالات متداول</a>
+              </li>
+              <li>
+                <a href="#" onclick="handleFooterClick('help')">مرکز راهنما</a>
+              </li>
+              <li>
+                <a href="#" onclick="handleFooterClick('newsletter')"
+                  >خبرنامه</a
+                >
+              </li>
+              <li><a href="blog.html">وبلاگ</a></li>
+            </ul>
+          </div>
+
+          <div class="footer-section">
+            <h4>تماس با ما</h4>
+            <ul class="contact-info">
+              <li>تلفن: ۰۹۰۳۶۰۰۶۰۳۵</li>
+              <li>ایمیل: hesarimahdi261@gamil.com</li>
+              <li>ساعات کاری: 7:00 الی 18:00</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="footer-bottom">
+          <p>© ۱۴۰۴ مرکز سلامت ساختمانی. تمامی حقوق محفوظ است.</p>
+        </div>
+      </div>
+    </footer>
+
+    <script src="script.js"></script>
+  </body>
+</html>

@@ -1,0 +1,1577 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ماشین حساب ارزیابی لرزه‌ای | مرکز سلامت ساختمانی</title>
+    <link rel="stylesheet" href="styles.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="icon" type="image/png" href="Favicon.png" />
+    <link rel="shortcut icon" type="image/png" href="Favicon.png" />
+    <link rel="apple-touch-icon" href="Favicon.png" />
+
+    <!-- EmailJS and Supabase Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.3/dist/umd/supabase.js"></script>
+    <script src="config.js"></script>
+    <style>
+      .calculator-container {
+        max-width: 800px;
+        margin: 3rem auto;
+        background: var(--background);
+        padding: 2.5rem;
+        border-radius: 1rem;
+        box-shadow: var(--shadow-lg);
+      }
+
+      .calculator-form {
+        display: grid;
+        gap: 1.5rem;
+      }
+
+      .form-group {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+      }
+
+      .form-group label {
+        font-weight: 600;
+        color: var(--text-primary);
+        font-size: 1rem;
+      }
+
+      .form-group input,
+      .form-group select {
+        padding: 0.75rem;
+        border: 2px solid var(--border-color);
+        border-radius: 0.5rem;
+        font-family: "Vazirmatn", sans-serif;
+        font-size: 1rem;
+        transition: border-color 0.3s ease;
+      }
+
+      .form-group input:focus,
+      .form-group select:focus {
+        outline: none;
+        border-color: var(--primary-color);
+      }
+
+      .form-row {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 1.5rem;
+      }
+
+      .form-group.full-width {
+        grid-column: 1 / -1;
+      }
+
+      .calculate-btn {
+        padding: 1rem 2rem;
+        background: var(--primary-color);
+        color: white;
+        border: none;
+        border-radius: 0.5rem;
+        font-size: 1.1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        margin-top: 1rem;
+      }
+
+      .calculate-btn:hover {
+        background: var(--primary-hover);
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-md);
+      }
+
+      /* Result Popup Modal */
+      .result-modal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.7);
+        z-index: 2000;
+        align-items: center;
+        justify-content: center;
+        padding: 2rem;
+      }
+
+      .result-modal.active {
+        display: flex;
+      }
+
+      .result-modal-content {
+        background: var(--background);
+        border-radius: 1rem;
+        padding: 2.5rem;
+        max-width: 600px;
+        width: 100%;
+        max-height: 90vh;
+        overflow-y: auto;
+        box-shadow: var(--shadow-xl);
+        position: relative;
+      }
+
+      .result-modal-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2rem;
+        padding-bottom: 1rem;
+        border-bottom: 2px solid var(--border-color);
+      }
+
+      .result-modal-header h2 {
+        margin: 0;
+        color: var(--text-primary);
+        font-size: 1.75rem;
+      }
+
+      .close-modal {
+        background: none;
+        border: none;
+        font-size: 2rem;
+        color: var(--text-secondary);
+        cursor: pointer;
+        padding: 0;
+        width: 40px;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        transition: all 0.3s ease;
+      }
+
+      .close-modal:hover {
+        background: var(--background-alt);
+        color: var(--text-primary);
+      }
+
+      .result-score {
+        text-align: center;
+        padding: 2rem;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-radius: 1rem;
+        margin-bottom: 2rem;
+        color: white;
+      }
+
+      .result-score-value {
+        font-size: 4rem;
+        font-weight: 700;
+        margin: 1rem 0;
+      }
+
+      .result-score-label {
+        font-size: 1.25rem;
+        opacity: 0.9;
+      }
+
+      .result-details {
+        display: grid;
+        gap: 1rem;
+      }
+
+      .result-item {
+        display: flex;
+        justify-content: space-between;
+        padding: 1rem;
+        background: var(--background-alt);
+        border-radius: 0.5rem;
+      }
+
+      .result-item-label {
+        font-weight: 600;
+        color: var(--text-primary);
+      }
+
+      .result-item-value {
+        color: var(--text-secondary);
+      }
+
+      .result-recommendation {
+        margin-top: 2rem;
+        padding: 1.5rem;
+        background: var(--background-alt);
+        border-radius: 0.5rem;
+        border-right: 4px solid var(--primary-color);
+      }
+
+      .result-recommendation h3 {
+        margin-top: 0;
+        color: var(--primary-color);
+      }
+
+      @media (max-width: 768px) {
+        .calculator-container {
+          padding: 1.5rem;
+          margin: 1.5rem auto;
+        }
+
+        .form-row {
+          grid-template-columns: 1fr;
+        }
+
+        .result-modal-content {
+          padding: 1.5rem;
+        }
+
+        .result-score-value {
+          font-size: 3rem;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Header -->
+    <header class="header">
+      <div class="container">
+        <div class="header-content">
+          <div class="search-icon" onclick="toggleSearch()">
+            <svg viewBox="0 0 24 24">
+              <path
+                d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"
+              />
+            </svg>
+          </div>
+          <div class="logo">
+            <a href="index.html">
+              <img
+                src="logo.png"
+                alt="Building Health Institute - BHI | مرکز سلامت ساختمانی"
+              />
+            </a>
+          </div>
+          <nav class="main-nav">
+            <ul>
+              <li><a href="index.html">خانه</a></li>
+              <li><a href="about.html">درباره ما</a></li>
+              <li><a href="services.html" class="active">خدمات</a></li>
+              <li><a href="certification.html">گواهینامه ها</a></li>
+              <li><a href="resources.html">منابع</a></li>
+              <li><a href="blog.html">وبلاگ</a></li>
+              <li><a href="contact.html">تماس</a></li>
+            </ul>
+          </nav>
+          <div class="header-actions">
+            <button class="btn btn-outline" onclick="openAuthModal('signIn')">
+              ورود
+            </button>
+            <button class="btn btn-primary" onclick="openAuthModal('signUp')">
+              ایجاد حساب
+            </button>
+          </div>
+
+          <!-- Hamburger Menu for Mobile -->
+          <div class="hamburger-menu" onclick="toggleMobileMenu()">
+            <span></span>
+            <span></span>
+            <span></span>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Mobile Navigation Overlay -->
+    <div
+      class="mobile-nav-overlay"
+      id="mobileNavOverlay"
+      onclick="closeMobileMenu()"
+    >
+      <div class="mobile-nav-menu" onclick="event.stopPropagation()">
+        <div class="mobile-nav-header">
+          <div class="logo">
+            <img src="logo.png" alt="مرکز سلامت ساختمانی" />
+          </div>
+          <button class="close-mobile-nav" onclick="closeMobileMenu()">
+            <svg viewBox="0 0 24 24">
+              <path
+                d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"
+              />
+            </svg>
+          </button>
+        </div>
+        <nav class="mobile-nav">
+          <ul>
+            <li><a href="index.html" onclick="closeMobileMenu()">خانه</a></li>
+            <li>
+              <a href="about.html" onclick="closeMobileMenu()">درباره ما</a>
+            </li>
+            <li>
+              <a href="services.html" onclick="closeMobileMenu()">خدمات</a>
+            </li>
+            <li>
+              <a href="certification.html" onclick="closeMobileMenu()"
+                >گواهینامه ها</a
+              >
+            </li>
+            <li>
+              <a href="resources.html" onclick="closeMobileMenu()">منابع</a>
+            </li>
+            <li><a href="blog.html" onclick="closeMobileMenu()">وبلاگ</a></li>
+            <li><a href="contact.html" onclick="closeMobileMenu()">تماس</a></li>
+          </ul>
+        </nav>
+        <div class="mobile-nav-actions">
+          <button
+            class="btn btn-outline mobile-btn"
+            onclick="openAuthModal('signIn'); closeMobileMenu();"
+          >
+            ورود
+          </button>
+          <button
+            class="btn btn-primary mobile-btn"
+            onclick="openAuthModal('signUp'); closeMobileMenu();"
+          >
+            ایجاد حساب
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Page Header -->
+    <section class="page-header services-hero">
+      <div class="container">
+        <h1>ماشین حساب ارزیابی لرزه‌ای</h1>
+        <p>محاسبه و ارزیابی خطر زلزله ساختمان شما</p>
+      </div>
+    </section>
+
+    <!-- Main Content -->
+    <main class="page-content">
+      <div class="container">
+        <div class="calculator-container">
+          <h2 style="text-align: center; margin-bottom: 2rem; color: var(--text-primary);">
+            فرم ارزیابی لرزه‌ای ساختمان
+          </h2>
+          <p style="text-align: center; color: var(--text-secondary); margin-bottom: 2rem;">
+            لطفاً اطلاعات ساختمان خود را وارد کنید تا ارزیابی اولیه خطر زلزله انجام شود.
+          </p>
+
+          <form class="calculator-form" id="seismicCalculatorForm" novalidate onsubmit="calculateSeismicRisk(event)">
+            <div class="form-row">
+              <div class="form-group">
+                <label for="buildingType">نوع ساختمان *</label>
+                <select id="buildingType" name="buildingType" required>
+                  <option value="">انتخاب کنید</option>
+                  <option value="residential">مسکونی</option>
+                  <option value="commercial">تجاری</option>
+                  <option value="industrial">صنعتی</option>
+                  <option value="educational">آموزشی</option>
+                  <option value="healthcare">بهداشتی</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label for="buildingMaterial">مصالح ساختمانی *</label>
+                <select id="buildingMaterial" name="buildingMaterial" required>
+                  <option value="">انتخاب کنید</option>
+                  <option value="concrete">بتن مسلح</option>
+                  <option value="steel">فولاد</option>
+                  <option value="masonry">آجر و بلوک</option>
+                  <option value="mixed">ترکیبی</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label for="numStories">تعداد طبقات *</label>
+                <input
+                  type="number"
+                  id="numStories"
+                  name="numStories"
+                  min="1"
+                  max="100"
+                  required
+                  placeholder="مثال: 5"
+                />
+              </div>
+
+              <div class="form-group">
+                <label for="constructionYear">سال ساخت سازه (شمسی) *</label>
+                <input
+                  type="number"
+                  id="constructionYear"
+                  name="constructionYear"
+                  min="1300"
+                  max="2100"
+                  required
+                  placeholder="مثال: ۱۳۹۹"
+                />
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label for="hasEngineeringPlans">ایا سازه نقشه های نظام مهندسی دارد؟ *</label>
+                <select id="hasEngineeringPlans" name="hasEngineeringPlans" required>
+                  <option value="">انتخاب کنید</option>
+                  <option value="yes">بله</option>
+                  <option value="no">خیر</option>
+                  <option value="unknown">نامشخص</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label for="soilType">نوع خاک *</label>
+                <select id="soilType" name="soilType" required>
+                  <option value="">انتخاب کنید</option>
+                  <option value="hard"> تیپ I</option>
+                  <option value="medium"> تیپ II</option>
+                  <option value="soft"> تیپ III</option>
+                  <option value="very-soft"> تیپ IV</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label for="faultDistance">فاصله تا گسل (کیلومتر) *</label>
+                <input
+                  type="number"
+                  id="faultDistance"
+                  name="faultDistance"
+                  min="0"
+                  step="0.1"
+                  required
+                  placeholder="مثال: 5.5"
+                />
+              </div>
+
+              <div class="form-group">
+                <label for="dimensionCompliance">ایا ابعاد المان با نقشه ها تطابق دارد؟ *</label>
+                <select id="dimensionCompliance" name="dimensionCompliance" required>
+                  <option value="">انتخاب کنید</option>
+                  <option value="yes">بله</option>
+                  <option value="partial">تا حدی</option>
+                  <option value="no">خیر</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label for="qualifiedSupervisor">آیا سازه دارای مجری ذی طلاح می باشد؟ *</label>
+                <select id="qualifiedSupervisor" name="qualifiedSupervisor" required>
+                  <option value="">انتخاب کنید</option>
+                  <option value="yes">بله</option>
+                  <option value="no">خیر</option>
+                  <option value="unknown">نامشخص</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label for="seismicZone">منطقه لرزه‌خیزی *</label>
+                <select id="seismicZone" name="seismicZone" required>
+                  <option value="">انتخاب کنید</option>
+                  <option value="very-high">خیلی زیاد</option>
+                  <option value="high">زیاد</option>
+                  <option value="medium">متوسط</option>
+                  <option value="low">کم</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label for="lateralSystem">نوع سیستم باربر جانبی ساختمان *</label>
+                <select id="lateralSystem" name="lateralSystem" required>
+                  <option value="">انتخاب کنید</option>
+                  <option value="moment-frame">قاب خمشی</option>
+                  <option value="shear-wall">دیوار برشی</option>
+                  <option value="braced-frame">قاب مهاربندی شده</option>
+                  <option value="combined">ترکیبی</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label for="roofType">نوع سقف *</label>
+                <select id="roofType" name="roofType" required>
+                  <option value="">انتخاب کنید</option>
+                  <option value="concrete-slab">دال بتنی</option>
+                  <option value="joist-block">تیرچه‌بلوک</option>
+                  <option value="composite">کامپوزیت</option>
+                  <option value="kromit">کرومیت</option>
+                  <option value="steel-deck">عرشه فولادی</option>
+                  <option value="other">غیره</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label for="foundationType">نوع فنداسیون *</label>
+                <select id="foundationType" name="foundationType" required>
+                  <option value="">انتخاب کنید</option>
+                  <option value="isolated">منفرد</option>
+                  <option value="strip">نواری</option>
+                  <option value="raft">گسترده</option>
+                  <option value="piled">شمع‌دار</option>
+                  <option value="other">غیره</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label for="foundationDepth">عمق فنداسیون نسبت به سطح زمین (متر) *</label>
+                <input
+                  type="number"
+                  id="foundationDepth"
+                  name="foundationDepth"
+                  min="0"
+                  step="0.1"
+                  required
+                  placeholder="مثال: 1.8"
+                />
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label for="materialQuality">کیفیت ظاهری بتن یا فولاد در محل بازدید *</label>
+                <select id="materialQuality" name="materialQuality" required>
+                  <option value="">انتخاب کنید</option>
+                  <option value="good">خوب</option>
+                  <option value="average">متوسط</option>
+                  <option value="poor">ضعیف</option>
+                  <option value="localized-damage">تخریب موضعی</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label for="wallCracks">آیا ترک‌های افقی یا برشی در دیوارهای باربر مشاهده شده است؟ *</label>
+                <select id="wallCracks" name="wallCracks" required>
+                  <option value="">انتخاب کنید</option>
+                  <option value="none">خیر</option>
+                  <option value="minor">ترک‌های محدود</option>
+                  <option value="moderate">ترک‌های متوسط</option>
+                  <option value="severe">ترک‌های گسترده</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label for="corrosion">آیا تیرها یا ستون‌ها دچار زنگ‌زدگی یا پوسته شدن بتن هستند؟ *</label>
+                <select id="corrosion" name="corrosion" required>
+                  <option value="">انتخاب کنید</option>
+                  <option value="none">خیر</option>
+                  <option value="minor">جزئی</option>
+                  <option value="moderate">متوسط</option>
+                  <option value="severe">شدید</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label for="floorDeformation">آیا تغییر شکل غیرعادی در کف‌ها یا سقف‌ها مشاهده می‌شود؟ *</label>
+                <select id="floorDeformation" name="floorDeformation" required>
+                  <option value="">انتخاب کنید</option>
+                  <option value="no">خیر</option>
+                  <option value="minor">جزئی</option>
+                  <option value="significant">قابل توجه</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label for="doorOperation">آیا درهای داخلی به سختی باز و بسته می‌شوند؟ *</label>
+                <select id="doorOperation" name="doorOperation" required>
+                  <option value="">انتخاب کنید</option>
+                  <option value="no">خیر</option>
+                  <option value="occasional">به ندرت</option>
+                  <option value="frequent">مکرر</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label for="dampness">آیا آثار نم‌زدگی یا نشت رطوبت در طبقات پایین وجود دارد؟ *</label>
+                <select id="dampness" name="dampness" required>
+                  <option value="">انتخاب کنید</option>
+                  <option value="no">خیر</option>
+                  <option value="minor">محدود</option>
+                  <option value="moderate">متوسط</option>
+                  <option value="severe">شدید</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label for="hasRetrofit">مقاوم‌سازی انجام شده؟</label>
+                <select id="hasRetrofit" name="hasRetrofit">
+                  <option value="no">خیر</option>
+                  <option value="partial">جزئی</option>
+                  <option value="complete">کامل</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label for="crackLevel">ترک های موجود در سازه؟ *</label>
+                <select id="crackLevel" name="crackLevel" required>
+                  <option value="">انتخاب کنید</option>
+                  <option value="none">بدون ترک</option>
+                  <option value="hairline">ترک های مویی</option>
+                  <option value="moderate">ترک های متوسط</option>
+                  <option value="severe">ترک های گسترده</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label for="beamDeflection">ایا تیرها خیز داده اند؟ *</label>
+                <select id="beamDeflection" name="beamDeflection" required>
+                  <option value="">انتخاب کنید</option>
+                  <option value="no">خیر</option>
+                  <option value="minor">خیز جزئی</option>
+                  <option value="significant">خیز قابل توجه</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label for="hasSettlement">ایا سازه دچار نشست شده است؟ *</label>
+                <select id="hasSettlement" name="hasSettlement" required>
+                  <option value="">انتخاب کنید</option>
+                  <option value="no">خیر</option>
+                  <option value="minor">نشست جزئی</option>
+                  <option value="significant">نشست قابل توجه</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label for="lastRenovationYear">تاریخ آخرین بازسازی یا مرمت سازه‌ای (شمسی)</label>
+                <input
+                  type="number"
+                  id="lastRenovationYear"
+                  name="lastRenovationYear"
+                  min="1300"
+                  max="2100"
+                  placeholder="مثال: ۱۳۹۷"
+                />
+              </div>
+
+              <div class="form-group">
+                <label for="repairCount">دفعات تعمیرات انجام‌شده در ۱۰ سال اخیر</label>
+                <input
+                  type="number"
+                  id="repairCount"
+                  name="repairCount"
+                  min="0"
+                  max="50"
+                  placeholder="مثال: 3"
+                />
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label for="usageChange">آیا تغییر کاربری یا اضافه طبقه انجام شده است؟ *</label>
+                <select id="usageChange" name="usageChange" required>
+                  <option value="">انتخاب کنید</option>
+                  <option value="no">خیر</option>
+                  <option value="partial">بخشی</option>
+                  <option value="yes">بله</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label for="drainageCondition">آیا سیستم زهکشی یا آب‌بندی فنداسیون به درستی کار می‌کند؟ *</label>
+                <select id="drainageCondition" name="drainageCondition" required>
+                  <option value="">انتخاب کنید</option>
+                  <option value="good">بله</option>
+                  <option value="partial">تا حدی</option>
+                  <option value="poor">خیر</option>
+                  <option value="unknown">نامشخص</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group full-width">
+                <label for="rooftopLoad">آیا بارگذاری اضافی در پشت‌بام وجود دارد؟ *</label>
+                <select id="rooftopLoad" name="rooftopLoad" required>
+                  <option value="">انتخاب کنید</option>
+                  <option value="none">خیر</option>
+                  <option value="water-tank">مخزن آب</option>
+                  <option value="equipment">تجهیزات سنگین</option>
+                  <option value="both">ترکیبی</option>
+                  <option value="unknown">نامشخص</option>
+                </select>
+              </div>
+            </div>
+
+            <button type="submit" class="calculate-btn">
+              محاسبه ارزیابی لرزه‌ای
+            </button>
+          </form>
+        </div>
+      </div>
+    </main>
+
+    <!-- Result Modal -->
+    <div class="result-modal" id="resultModal">
+      <div class="result-modal-content">
+        <div class="result-modal-header">
+          <h2>نتایج ارزیابی لرزه‌ای</h2>
+          <button class="close-modal" onclick="closeResultModal()">×</button>
+        </div>
+
+        <div class="result-score" id="resultScore">
+          <div class="result-score-label">امتیاز خطر زلزله</div>
+          <div class="result-score-value" id="scoreValue">0</div>
+          <div class="result-score-label" id="riskLevel">-</div>
+        </div>
+
+        <div class="result-details" id="resultDetails">
+          <!-- Details will be populated by JavaScript -->
+        </div>
+
+        <div class="result-recommendation" id="resultRecommendation">
+          <!-- Recommendation will be populated by JavaScript -->
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+      <div class="container">
+        <div class="footer-content">
+          <div class="footer-section">
+            <h3>مرکز سلامت ساختمانی</h3>
+            <p>
+              ارائه‌دهنده اطلاعات و خدمات تخصصی در زمینه ارزیابی خطرات املاک و
+              بیمه
+            </p>
+            <div class="social-links">
+              <a
+                href="#"
+                onclick="handleSocialClick('linkedin')"
+                title="LinkedIn"
+              >
+                <svg
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="currentColor"
+                >
+                  <path
+                    d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"
+                  />
+                </svg>
+              </a>
+              <a
+                href="#"
+                onclick="handleSocialClick('telegram')"
+                title="Telegram"
+              >
+                <svg
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="currentColor"
+                >
+                  <path
+                    d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"
+                  />
+                </svg>
+              </a>
+              <a
+                href="#"
+                onclick="handleSocialClick('instagram')"
+                title="Instagram"
+              >
+                <svg
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="currentColor"
+                >
+                  <path
+                    d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"
+                  />
+                </svg>
+              </a>
+            </div>
+          </div>
+
+          <div class="footer-section">
+            <h4>شرکت</h4>
+            <ul>
+              <li><a href="about.html">درباره ما</a></li>
+              <li>
+                <a href="#" onclick="handleFooterClick('careers')">فرصت‌های شغلی</a>
+              </li>
+              <li>
+                <a href="#" onclick="handleFooterClick('media')">رسانه</a>
+              </li>
+              <li>
+                <a href="#" onclick="handleFooterClick('privacy')">حریم خصوصی</a>
+              </li>
+              <li>
+                <a href="#" onclick="handleFooterClick('terms')">شرایط استفاده</a>
+              </li>
+            </ul>
+          </div>
+
+          <div class="footer-section">
+            <h4>منابع</h4>
+            <ul>
+              <li>
+                <a href="#" onclick="handleFooterClick('faq')">سوالات متداول</a>
+              </li>
+              <li>
+                <a href="#" onclick="handleFooterClick('help')">مرکز راهنما</a>
+              </li>
+              <li>
+                <a href="#" onclick="handleFooterClick('newsletter')">خبرنامه</a>
+              </li>
+              <li><a href="blog.html">وبلاگ</a></li>
+            </ul>
+          </div>
+
+          <div class="footer-section">
+            <h4>تماس با ما</h4>
+            <ul class="contact-info">
+              <li>تلفن: ۰۹۰۳۶۰۰۶۰۳۵</li>
+              <li>ایمیل: hesarimahdi261@gamil.com</li>
+              <li>ساعات کاری: 7:00 الی 18:00</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="footer-bottom">
+          <p>© ۱۴۰۴ مرکز سلامت ساختمانی. تمامی حقوق محفوظ است.</p>
+        </div>
+      </div>
+    </footer>
+
+    <script src="script.js"></script>
+    <script>
+      const DIGIT_MAP = {
+        "۰": "0",
+        "۱": "1",
+        "۲": "2",
+        "۳": "3",
+        "۴": "4",
+        "۵": "5",
+        "۶": "6",
+        "۷": "7",
+        "۸": "8",
+        "۹": "9",
+        "٠": "0",
+        "١": "1",
+        "٢": "2",
+        "٣": "3",
+        "٤": "4",
+        "٥": "5",
+        "٦": "6",
+        "٧": "7",
+        "٨": "8",
+        "٩": "9"
+      };
+
+      function normalizeNumericInput(value) {
+        if (value == null) return "";
+        let normalized = value.toString().trim();
+        normalized = normalized
+          .split("")
+          .map((char) => (DIGIT_MAP[char] !== undefined ? DIGIT_MAP[char] : char))
+          .join("");
+        normalized = normalized
+          .replace(/[٬,]/g, "")
+          .replace(/[٫،]/g, ".");
+        return normalized;
+      }
+
+      function calculateSeismicRisk(event) {
+        if (event) {
+          event.preventDefault();
+        }
+
+        const form = document.getElementById("seismicCalculatorForm");
+        if (!form.checkValidity()) {
+          form.reportValidity();
+          return;
+        }
+
+        // Get form values
+        const buildingType = document.getElementById("buildingType").value;
+        const buildingMaterial = document.getElementById("buildingMaterial").value;
+        const numStories = parseInt(normalizeNumericInput(document.getElementById("numStories").value), 10);
+        const buildingAge = parseInt(normalizeNumericInput(document.getElementById("buildingAge").value), 10);
+        const constructionYearRaw = normalizeNumericInput(document.getElementById("constructionYear").value);
+        const constructionYearInput = parseInt(constructionYearRaw, 10);
+        const constructionYear = Number.isFinite(constructionYearInput) && constructionYearInput >= 1700
+          ? constructionYearInput - 621
+          : constructionYearInput;
+        const hasEngineeringPlans = document.getElementById("hasEngineeringPlans").value;
+        const soilType = document.getElementById("soilType").value;
+        const faultDistance = parseFloat(normalizeNumericInput(document.getElementById("faultDistance").value));
+        const dimensionCompliance = document.getElementById("dimensionCompliance").value;
+        const qualifiedSupervisor = document.getElementById("qualifiedSupervisor").value;
+        const lateralSystem = document.getElementById("lateralSystem").value;
+        const roofType = document.getElementById("roofType").value;
+        const foundationType = document.getElementById("foundationType").value;
+        const foundationDepth = parseFloat(normalizeNumericInput(document.getElementById("foundationDepth").value));
+        const materialQuality = document.getElementById("materialQuality").value;
+        const wallCracks = document.getElementById("wallCracks").value;
+        const corrosion = document.getElementById("corrosion").value;
+        const floorDeformation = document.getElementById("floorDeformation").value;
+        const doorOperation = document.getElementById("doorOperation").value;
+        const dampness = document.getElementById("dampness").value;
+        const seismicZone = document.getElementById("seismicZone").value;
+        const hasRetrofit = document.getElementById("hasRetrofit").value;
+        const crackLevel = document.getElementById("crackLevel").value;
+        const beamDeflection = document.getElementById("beamDeflection").value;
+        const hasSettlement = document.getElementById("hasSettlement").value;
+        const lastRenovationYearRaw = normalizeNumericInput(document.getElementById("lastRenovationYear").value);
+        const lastRenovationYearInput = parseInt(lastRenovationYearRaw, 10);
+        const lastRenovationYear = Number.isFinite(lastRenovationYearInput) && lastRenovationYearInput >= 1700
+          ? lastRenovationYearInput - 621
+          : lastRenovationYearInput;
+        const repairCountValue = normalizeNumericInput(document.getElementById("repairCount").value || "0");
+        const repairCount = repairCountValue === "" ? 0 : parseInt(repairCountValue, 10);
+        const usageChange = document.getElementById("usageChange").value;
+        const drainageCondition = document.getElementById("drainageCondition").value;
+        const rooftopLoad = document.getElementById("rooftopLoad").value;
+
+        // Calculate base score (0-100, higher = more risk)
+        let riskScore = 50; // Base score
+
+        // Building type factor
+        const typeFactors = {
+          residential: -5,
+          commercial: 0,
+          industrial: 10,
+          educational: 5,
+          healthcare: 5
+        };
+        riskScore += typeFactors[buildingType] || 0;
+
+        // Material factor
+        const materialFactors = {
+          concrete: -5,
+          steel: -10,
+          masonry: 15,
+          mixed: 5
+        };
+        riskScore += materialFactors[buildingMaterial] || 0;
+
+        // Stories factor (more stories = more risk)
+        if (numStories > 10) riskScore += 10;
+        else if (numStories > 5) riskScore += 5;
+        else if (numStories > 3) riskScore += 2;
+
+        // Age factor (older = more risk)
+        if (buildingAge > 50) riskScore += 15;
+        else if (buildingAge > 30) riskScore += 10;
+        else if (buildingAge > 20) riskScore += 5;
+        else if (buildingAge > 10) riskScore += 2;
+
+        // Construction year factor (cross-check) - Persian calendar
+        if (Number.isFinite(constructionYear) && constructionYear > 0) {
+          // Get current Persian year (approximately: Gregorian - 621)
+          const gregorianYear = new Date().getFullYear();
+          const currentPersianYear = gregorianYear - 621;
+          const structuralAge = Math.max(0, currentPersianYear - constructionYear);
+          if (structuralAge > 50) riskScore += 10;
+          else if (structuralAge > 30) riskScore += 6;
+          else if (structuralAge > 20) riskScore += 3;
+          else if (structuralAge > 10) riskScore += 1;
+          else riskScore -= 2;
+        }
+
+        // Engineering plans factor
+        const planFactors = {
+          yes: -8,
+          no: 10,
+          unknown: 0
+        };
+        riskScore += planFactors[hasEngineeringPlans] || 0;
+
+        // Soil type factor
+        const soilFactors = {
+          hard: -10,
+          medium: 0,
+          soft: 15,
+          "very-soft": 25
+        };
+        riskScore += soilFactors[soilType] || 0;
+
+        // Fault distance factor (closer = more risk)
+        if (faultDistance < 5) riskScore += 20;
+        else if (faultDistance < 10) riskScore += 10;
+        else if (faultDistance < 20) riskScore += 5;
+        else if (faultDistance < 50) riskScore += 2;
+
+        // Dimension compliance factor
+        const dimensionFactors = {
+          yes: -8,
+          partial: 5,
+          no: 15
+        };
+        riskScore += dimensionFactors[dimensionCompliance] || 0;
+
+        // Qualified supervisor factor
+        const supervisorFactors = {
+          yes: -10,
+          no: 12,
+          unknown: 5
+        };
+        riskScore += supervisorFactors[qualifiedSupervisor] || 0;
+
+        // Lateral system factor
+        const lateralFactors = {
+          "moment-frame": 5,
+          "shear-wall": -12,
+          "braced-frame": -8,
+          combined: -15
+        };
+        riskScore += lateralFactors[lateralSystem] || 0;
+
+        // Roof type factor
+        const roofFactors = {
+          "concrete-slab": 6,
+          "joist-block": 4,
+          composite: 2,
+          kromit: 1,
+          "steel-deck": -3,
+          other: 0
+        };
+        riskScore += roofFactors[roofType] || 0;
+
+        // Foundation type factor
+        const foundationFactors = {
+          isolated: 6,
+          strip: 2,
+          raft: -6,
+          piled: -10,
+          other: 0
+        };
+        riskScore += foundationFactors[foundationType] || 0;
+
+        // Foundation depth factor
+        if (Number.isFinite(foundationDepth)) {
+          if (foundationDepth < 0.8) riskScore += 12;
+          else if (foundationDepth < 1.2) riskScore += 6;
+          else if (foundationDepth < 2) riskScore += 2;
+          else riskScore -= 4;
+        }
+
+        // Material quality factor
+        const materialQualityFactors = {
+          good: -12,
+          average: 0,
+          poor: 14,
+          "localized-damage": 24
+        };
+        riskScore += materialQualityFactors[materialQuality] || 0;
+
+        // Wall crack factor
+        const wallCrackFactors = {
+          none: 0,
+          minor: 12,
+          moderate: 20,
+          severe: 32
+        };
+        riskScore += wallCrackFactors[wallCracks] || 0;
+
+        // Corrosion factor
+        const corrosionFactors = {
+          none: 0,
+          minor: 10,
+          moderate: 18,
+          severe: 28
+        };
+        riskScore += corrosionFactors[corrosion] || 0;
+
+        // Floor deformation factor
+        const floorDeformationFactors = {
+          no: 0,
+          minor: 14,
+          significant: 26
+        };
+        riskScore += floorDeformationFactors[floorDeformation] || 0;
+
+        // Door operation factor
+        const doorOperationFactors = {
+          no: 0,
+          occasional: 10,
+          frequent: 18
+        };
+        riskScore += doorOperationFactors[doorOperation] || 0;
+
+        // Dampness factor
+        const dampnessFactors = {
+          no: 0,
+          minor: 8,
+          moderate: 14,
+          severe: 20
+        };
+        riskScore += dampnessFactors[dampness] || 0;
+
+        // Seismic zone factor
+        const zoneFactors = {
+          "very-high": 20,
+          high: 10,
+          medium: 5,
+          low: -5
+        };
+        riskScore += zoneFactors[seismicZone] || 0;
+
+        // Retrofit factor
+        const retrofitFactors = {
+          no: 0,
+          partial: -10,
+          complete: -20
+        };
+        riskScore += retrofitFactors[hasRetrofit] || 0;
+
+        // Crack level factor
+        const crackFactors = {
+          none: 0,
+          hairline: 8,
+          moderate: 18,
+          severe: 28
+        };
+        riskScore += crackFactors[crackLevel] || 0;
+
+        // Beam deflection factor
+        const deflectionFactors = {
+          no: 0,
+          minor: 12,
+          significant: 22
+        };
+        riskScore += deflectionFactors[beamDeflection] || 0;
+
+        // Settlement factor
+        const settlementFactors = {
+          no: 0,
+          minor: 12,
+          significant: 25
+        };
+        riskScore += settlementFactors[hasSettlement] || 0;
+
+        // Last renovation factor - Persian calendar
+        if (Number.isFinite(lastRenovationYear) && lastRenovationYear > 0) {
+          const gregorianYear = new Date().getFullYear();
+          const currentPersianYear = gregorianYear - 621;
+          const renovationAge = Math.max(0, currentPersianYear - lastRenovationYear);
+          if (renovationAge > 20) riskScore += 10;
+          else if (renovationAge > 10) riskScore += 6;
+          else if (renovationAge > 5) riskScore += 3;
+          else riskScore -= 6;
+        }
+
+        // Repair count factor
+        if (Number.isFinite(repairCount)) {
+          if (repairCount > 6) riskScore += 12;
+          else if (repairCount > 4) riskScore += 8;
+          else if (repairCount > 2) riskScore += 4;
+          else if (repairCount === 0) riskScore += 0;
+        }
+
+        // Usage change factor
+        const usageChangeFactors = {
+          no: 0,
+          partial: 10,
+          yes: 18
+        };
+        riskScore += usageChangeFactors[usageChange] || 0;
+
+        // Drainage condition factor
+        const drainageFactors = {
+          good: -8,
+          partial: 6,
+          poor: 16,
+          unknown: 2
+        };
+        riskScore += drainageFactors[drainageCondition] || 0;
+
+        // Rooftop load factor
+        const rooftopLoadFactors = {
+          none: 0,
+          "water-tank": 10,
+          equipment: 14,
+          both: 20,
+          unknown: 4
+        };
+        riskScore += rooftopLoadFactors[rooftopLoad] || 0;
+
+        // Clamp score between 0 and 100
+        riskScore = Math.max(0, Math.min(100, riskScore));
+
+        // Determine risk level
+        let riskLevel, riskColor;
+        if (riskScore >= 75) {
+          riskLevel = "خیلی زیاد";
+          riskColor = "#ef4444";
+        } else if (riskScore >= 50) {
+          riskLevel = "زیاد";
+          riskColor = "#f59e0b";
+        } else if (riskScore >= 25) {
+          riskLevel = "متوسط";
+          riskColor = "#fbbf24";
+        } else {
+          riskLevel = "کم";
+          riskColor = "#10b981";
+        }
+
+        // Update modal content
+        document.getElementById("scoreValue").textContent = riskScore;
+        document.getElementById("riskLevel").textContent = riskLevel;
+        document.getElementById("resultScore").style.background = `linear-gradient(135deg, ${riskColor} 0%, ${riskColor}dd 100%)`;
+
+        // Build details
+        const constructionYearDisplay = Number.isFinite(constructionYear) ? constructionYear + " شمسی" : "-";
+        const lastRenovationYearDisplay = Number.isFinite(lastRenovationYear) ? lastRenovationYear + " شمسی" : "-";
+
+        const details = [
+          { label: "نوع ساختمان", value: getBuildingTypeLabel(buildingType) },
+          { label: "مصالح ساختمانی", value: getMaterialLabel(buildingMaterial) },
+          { label: "تعداد طبقات", value: numStories },
+          { label: "سن ساختمان", value: buildingAge + " سال" },
+          { label: "سال ساخت", value: constructionYearDisplay },
+          { label: "نقشه های نظام مهندسی", value: getEngineeringPlanLabel(hasEngineeringPlans) },
+          { label: "نوع سیستم باربر جانبی", value: getLateralSystemLabel(lateralSystem) },
+          { label: "نوع سقف", value: getRoofTypeLabel(roofType) },
+          { label: "نوع فنداسیون", value: getFoundationTypeLabel(foundationType) },
+          { label: "عمق فنداسیون", value: Number.isFinite(foundationDepth) ? foundationDepth + " متر" : "-" },
+          { label: "نوع خاک", value: getSoilTypeLabel(soilType) },
+          { label: "فاصله تا گسل", value: Number.isFinite(faultDistance) ? faultDistance + " کیلومتر" : "-" },
+          { label: "تطابق ابعاد المان ها", value: getDimensionComplianceLabel(dimensionCompliance) },
+          { label: "مجری ذی صلاح", value: getSupervisorLabel(qualifiedSupervisor) },
+          { label: "کیفیت ظاهری مصالح", value: getMaterialQualityLabel(materialQuality) },
+          { label: "ترک های دیوار باربر", value: getWallCrackLabel(wallCracks) },
+          { label: "زنگ زدگی / پوسته شدن", value: getCorrosionLabel(corrosion) },
+          { label: "تغییر شکل کف ها", value: getFloorDeformationLabel(floorDeformation) },
+          { label: "عملکرد درهای داخلی", value: getDoorOperationLabel(doorOperation) },
+          { label: "نم زدگی طبقات پایین", value: getDampnessLabel(dampness) },
+          { label: "منطقه لرزه‌خیزی", value: getZoneLabel(seismicZone) },
+          { label: "مقاوم‌سازی", value: getRetrofitLabel(hasRetrofit) },
+          { label: "وضعیت ترک ها", value: getCrackLevelLabel(crackLevel) },
+          { label: "خیز تیرها", value: getBeamDeflectionLabel(beamDeflection) },
+          { label: "نشست سازه", value: getSettlementLabel(hasSettlement) },
+          { label: "آخرین بازسازی", value: lastRenovationYearDisplay },
+          { label: "تعمیرات 10 سال اخیر", value: Number.isFinite(repairCount) ? repairCount : "-" },
+          { label: "تغییر کاربری/اضافه طبقه", value: getUsageChangeLabel(usageChange) },
+          { label: "وضعیت زهکشی فنداسیون", value: getDrainageLabel(drainageCondition) },
+          { label: "بارگذاری اضافی پشت بام", value: getRooftopLoadLabel(rooftopLoad) }
+        ];
+
+        const detailsHtml = details.map(detail => `
+          <div class="result-item">
+            <span class="result-item-label">${detail.label}:</span>
+            <span class="result-item-value">${detail.value}</span>
+          </div>
+        `).join("");
+
+        document.getElementById("resultDetails").innerHTML = detailsHtml;
+
+        // Build recommendation
+        let recommendation = "";
+        if (riskScore >= 75) {
+          recommendation = `
+            <h3>⚠️ هشدار: خطر بسیار زیاد</h3>
+            <p>ساختمان شما در معرض خطر بالای زلزله قرار دارد. توصیه می‌شود:</p>
+            <ul style="padding-right: 1.5rem; margin-top: 1rem;">
+              <li>انجام بازرسی فوری توسط مهندس سازه</li>
+              <li>مقاوم‌سازی فوری و کامل ساختمان</li>
+              <li>در نظر گیری تخلیه در صورت لزوم</li>
+              <li>دریافت مشاوره تخصصی از مرکز سلامت ساختمانی</li>
+            </ul>
+          `;
+        } else if (riskScore >= 50) {
+          recommendation = `
+            <h3>⚠️ خطر زیاد</h3>
+            <p>ساختمان شما نیاز به توجه دارد. توصیه می‌شود:</p>
+            <ul style="padding-right: 1.5rem; margin-top: 1rem;">
+              <li>انجام ارزیابی دقیق‌تر توسط متخصص</li>
+              <li>برنامه‌ریزی برای مقاوم‌سازی</li>
+              <li>بررسی منظم وضعیت سازه</li>
+              <li>دریافت گزارش کامل از مرکز سلامت ساختمانی</li>
+            </ul>
+          `;
+        } else if (riskScore >= 25) {
+          recommendation = `
+            <h3>✅ خطر متوسط</h3>
+            <p>ساختمان شما در وضعیت قابل قبولی است. توصیه می‌شود:</p>
+            <ul style="padding-right: 1.5rem; margin-top: 1rem;">
+              <li>بررسی دوره‌ای وضعیت سازه</li>
+              <li>در نظر گیری بهبودهای جزئی</li>
+              <li>نظارت بر تغییرات سازه</li>
+            </ul>
+          `;
+        } else {
+          recommendation = `
+            <h3>✅ خطر کم</h3>
+            <p>ساختمان شما در وضعیت خوبی قرار دارد. توصیه می‌شود:</p>
+            <ul style="padding-right: 1.5rem; margin-top: 1rem;">
+              <li>نگهداری منظم ساختمان</li>
+              <li>بررسی دوره‌ای (هر 2-3 سال)</li>
+              <li>حفظ وضعیت فعلی</li>
+            </ul>
+          `;
+        }
+
+        document.getElementById("resultRecommendation").innerHTML = recommendation;
+
+        // Show modal
+        document.getElementById("resultModal").classList.add("active");
+      }
+
+      function closeResultModal() {
+        document.getElementById("resultModal").classList.remove("active");
+      }
+
+      // Close modal on outside click
+      document.getElementById("resultModal").addEventListener("click", function(e) {
+        if (e.target === this) {
+          closeResultModal();
+        }
+      });
+
+      // Helper functions
+      function getBuildingTypeLabel(value) {
+        const labels = {
+          residential: "مسکونی",
+          commercial: "تجاری",
+          industrial: "صنعتی",
+          educational: "آموزشی",
+          healthcare: "بهداشتی"
+        };
+        return labels[value] || value;
+      }
+
+      function getMaterialLabel(value) {
+        const labels = {
+          concrete: "بتن مسلح",
+          steel: "فولاد",
+          masonry: "آجر و بلوک",
+          mixed: "ترکیبی"
+        };
+        return labels[value] || value;
+      }
+
+      function getLateralSystemLabel(value) {
+        const labels = {
+          "moment-frame": "قاب خمشی",
+          "shear-wall": "دیوار برشی",
+          "braced-frame": "قاب مهاربندی شده",
+          combined: "ترکیبی"
+        };
+        return labels[value] || value;
+      }
+
+      function getRoofTypeLabel(value) {
+        const labels = {
+          "concrete-slab": "دال بتنی",
+          "joist-block": "تیرچه‌بلوک",
+          composite: "کامپوزیت",
+          kromit: "کرومیت",
+          "steel-deck": "عرشه فولادی",
+          other: "غیره"
+        };
+        return labels[value] || value;
+      }
+
+      function getFoundationTypeLabel(value) {
+        const labels = {
+          isolated: "منفرد",
+          strip: "نواری",
+          raft: "رادیه",
+          piled: "شمع دار",
+          other: "غیره"
+        };
+        return labels[value] || value;
+      }
+
+      function getEngineeringPlanLabel(value) {
+        const labels = {
+          yes: "بله",
+          no: "خیر",
+          unknown: "نامشخص"
+        };
+        return labels[value] || value;
+      }
+
+      function getSoilTypeLabel(value) {
+        const labels = {
+          hard: "سخت (سنگ)",
+          medium: "متوسط (خاک متراکم)",
+          soft: "نرم (خاک سست)",
+          "very-soft": "خیلی نرم (رس)"
+        };
+        return labels[value] || value;
+      }
+
+      function getDimensionComplianceLabel(value) {
+        const labels = {
+          yes: "بله",
+          partial: "تا حدی",
+          no: "خیر"
+        };
+        return labels[value] || value;
+      }
+
+      function getSupervisorLabel(value) {
+        const labels = {
+          yes: "بله",
+          no: "خیر",
+          unknown: "نامشخص"
+        };
+        return labels[value] || value;
+      }
+
+      function getMaterialQualityLabel(value) {
+        const labels = {
+          good: "خوب",
+          average: "متوسط",
+          poor: "ضعیف",
+          "localized-damage": "تخریب موضعی"
+        };
+        return labels[value] || value;
+      }
+
+      function getWallCrackLabel(value) {
+        const labels = {
+          none: "خیر",
+          minor: "ترک های محدود",
+          moderate: "ترک های متوسط",
+          severe: "ترک های گسترده"
+        };
+        return labels[value] || value;
+      }
+
+      function getCorrosionLabel(value) {
+        const labels = {
+          none: "خیر",
+          minor: "جزئی",
+          moderate: "متوسط",
+          severe: "شدید"
+        };
+        return labels[value] || value;
+      }
+
+      function getFloorDeformationLabel(value) {
+        const labels = {
+          no: "خیر",
+          minor: "جزئی",
+          significant: "قابل توجه"
+        };
+        return labels[value] || value;
+      }
+
+      function getDoorOperationLabel(value) {
+        const labels = {
+          no: "خیر",
+          occasional: "به ندرت",
+          frequent: "مکرر"
+        };
+        return labels[value] || value;
+      }
+
+      function getDampnessLabel(value) {
+        const labels = {
+          no: "خیر",
+          minor: "محدود",
+          moderate: "متوسط",
+          severe: "شدید"
+        };
+        return labels[value] || value;
+      }
+
+      function getZoneLabel(value) {
+        const labels = {
+          "very-high": "خیلی زیاد",
+          high: "زیاد",
+          medium: "متوسط",
+          low: "کم"
+        };
+        return labels[value] || value;
+      }
+
+      function getRetrofitLabel(value) {
+        const labels = {
+          no: "خیر",
+          partial: "جزئی",
+          complete: "کامل"
+        };
+        return labels[value] || value;
+      }
+
+      function getCrackLevelLabel(value) {
+        const labels = {
+          none: "بدون ترک",
+          hairline: "ترک های مویی",
+          moderate: "ترک های متوسط",
+          severe: "ترک های گسترده"
+        };
+        return labels[value] || value;
+      }
+
+      function getBeamDeflectionLabel(value) {
+        const labels = {
+          no: "خیر",
+          minor: "خیز جزئی",
+          significant: "خیز قابل توجه"
+        };
+        return labels[value] || value;
+      }
+
+      function getSettlementLabel(value) {
+        const labels = {
+          no: "خیر",
+          minor: "نشست جزئی",
+          significant: "نشست قابل توجه"
+        };
+        return labels[value] || value;
+      }
+
+      function getUsageChangeLabel(value) {
+        const labels = {
+          no: "خیر",
+          partial: "بخشی",
+          yes: "بله"
+        };
+        return labels[value] || value;
+      }
+
+      function getDrainageLabel(value) {
+        const labels = {
+          good: "بله",
+          partial: "تا حدی",
+          poor: "خیر",
+          unknown: "نامشخص"
+        };
+        return labels[value] || value;
+      }
+
+      function getRooftopLoadLabel(value) {
+        const labels = {
+          none: "خیر",
+          "water-tank": "مخزن آب",
+          equipment: "تجهیزات سنگین",
+          both: "ترکیبی",
+          unknown: "نامشخص"
+        };
+        return labels[value] || value;
+      }
+    </script>
+  </body>
+</html>
+
