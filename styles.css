@@ -5918,3 +5918,171 @@ body.explorer-active {
     font-size: 1.75rem;
   }
 }
+
+/* Algorithm-specific styles */
+.algorithm-flowchart {
+  background: var(--background-alt);
+  padding: 3rem;
+  border-radius: 1rem;
+  margin: 3rem 0;
+  overflow-x: auto;
+}
+
+.phase-card {
+  background: var(--background);
+  border: 2px solid var(--border-color);
+  border-radius: 1rem;
+  padding: 2rem;
+  margin-bottom: 2rem;
+  transition: all 0.3s ease;
+  border-right: 4px solid var(--primary-color);
+}
+
+.phase-card:hover {
+  box-shadow: var(--shadow-lg);
+  transform: translateY(-2px);
+}
+
+.phase-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.phase-number {
+  width: 50px;
+  height: 50px;
+  background: var(--primary-color);
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.phase-title {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.phase-objective {
+  background: var(--background-alt);
+  padding: 1rem 1.5rem;
+  border-radius: 0.5rem;
+  margin-bottom: 1.5rem;
+  border-right: 3px solid var(--primary-color);
+}
+
+.phase-objective strong {
+  color: var(--primary-color);
+  display: block;
+  margin-bottom: 0.5rem;
+}
+
+.test-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1rem;
+  margin: 1.5rem 0;
+}
+
+.test-item {
+  background: var(--background-alt);
+  padding: 1rem;
+  border-radius: 0.5rem;
+  border-right: 3px solid var(--success-color);
+}
+
+.test-item h4 {
+  color: var(--primary-color);
+  margin-bottom: 0.5rem;
+  font-size: 1.1rem;
+}
+
+.shi-formula {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 2rem;
+  border-radius: 1rem;
+  margin: 2rem 0;
+  text-align: center;
+  font-family: 'Courier New', monospace;
+  font-size: 1.1rem;
+  box-shadow: var(--shadow-lg);
+}
+
+.shi-formula code {
+  background: rgba(255, 255, 255, 0.2);
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  display: inline-block;
+  margin: 0.5rem;
+}
+
+.interpretation-table {
+  margin: 2rem 0;
+}
+
+.action-badge {
+  display: inline-block;
+  padding: 0.5rem 1rem;
+  border-radius: 2rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  margin-top: 0.5rem;
+}
+
+.badge-excellent {
+  background: var(--success-color);
+  color: white;
+}
+
+.badge-moderate {
+  background: var(--warning-color);
+  color: white;
+}
+
+.badge-weak {
+  background: #f97316;
+  color: white;
+}
+
+.badge-critical {
+  background: var(--danger-color);
+  color: white;
+}
+
+/* Responsive styles for algorithm page */
+@media (max-width: 768px) {
+  .algorithm-flowchart {
+    padding: 1.5rem;
+  }
+  
+  .phase-card {
+    padding: 1.5rem;
+  }
+  
+  .phase-title {
+    font-size: 1.5rem;
+  }
+  
+  .test-list {
+    grid-template-columns: 1fr;
+  }
+  
+  .shi-formula {
+    padding: 1.5rem;
+    font-size: 0.9rem;
+  }
+  
+  .shi-formula code {
+    display: block;
+    margin: 0.5rem 0;
+  }
+}
